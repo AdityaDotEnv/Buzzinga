@@ -6,7 +6,7 @@ Sentry's website is a dark-mode-first developer tool interface that speaks the l
 
 The typography pairing is deliberate: "Dammit Sans" appears at hero scale (88px, weight 700) as a display font with personality and attitude that matches Sentry's irreverent brand voice ("Code breaks. Fix it faster."), while Rubik serves as the workhorse UI font across all functional text — headings, body, buttons, captions, and navigation. Monaco provides the monospace layer for code snippets and technical content, completing the developer-tool trinity.
 
-What makes Sentry distinctive is its embrace of the "dark IDE" aesthetic without feeling cold or sterile. Warm purple tones replace the typical cool grays of developer tools, and bold illustrative elements (3D characters, colorful product screenshots) punctuate the dark canvas. The button system uses a signature muted purple (`#79628c`) with inset shadows that creates a tactile, almost physical quality — buttons feel like they could be pressed into the surface.
+What makes Sentry distinctive is its embrace of the "dark IDE" aesthetic without feeling cold or sterile. Warm purple tones replace the typical cool grays of developer tools, and bold illustrative elements (3D characters, colorful product screenshots) punctuate the dark canvas. The primary button system uses a signature pink-red accent (`rgb(225, 86, 124)`) with inset shadows that creates a tactile, almost physical quality — buttons feel like they could be pressed into the surface.
 
 **Key Characteristics:**
 - Dark purple-black backgrounds (`#1f1633`, `#150f23`) — never pure black
@@ -28,7 +28,8 @@ What makes Sentry distinctive is its embrace of the "dark IDE" aesthetic without
 
 ### Accent Colors
 - **Sentry Purple** (`#6a5fc1`): Primary interactive color — links, hover states, focus rings
-- **Muted Purple** (`#79628c`): Button backgrounds, secondary interactive elements
+- **Muted Purple** (`#79628c`): Secondary button backgrounds, secondary interactive elements
+- **Primary Pink-Red** (`rgb(225, 86, 124)`): Primary button backgrounds, primary accents, sign-up CTAs
 - **Deep Violet** (`#422082`): Select dropdowns, active states, high-emphasis surfaces
 - **Lime Green** (`#c2ef4e`): High-visibility accent, special links, badge highlights
 - **Coral** (`#ffb287`): Focus state backgrounds, warm accent
@@ -89,7 +90,7 @@ What makes Sentry distinctive is its embrace of the "dark IDE" aesthetic without
 ### Buttons
 
 **Primary Muted Purple**
-- Background: `#79628c` (rgb(121, 98, 140))
+- Background: `rgb(225, 86, 124)`
 - Text: `#ffffff`, uppercase, 14px, weight 500–700, letter-spacing 0.2px
 - Border: `1px solid #584674`
 - Radius: 13px
@@ -110,8 +111,8 @@ What makes Sentry distinctive is its embrace of the "dark IDE" aesthetic without
 - Text: `#1f1633`
 - Padding: 12px 16px
 - Radius: 8px
-- Hover: background transitions to `#6a5fc1`, text to white
-- Focus: background `#ffb287` (coral), outline `rgb(106, 95, 193) solid 0.125rem`
+- Hover: background transitions to `rgb(207, 76, 114)`, text to white
+- Focus: background `rgb(225, 86, 124)`, outline `rgb(225, 86, 124) solid 0.125rem`
 - Use: High-visibility CTA on dark backgrounds
 
 **Deep Violet (Select/Dropdown)**
@@ -242,14 +243,14 @@ What makes Sentry distinctive is its embrace of the "dark IDE" aesthetic without
 ### Quick Color Reference
 - Background: `#1f1633` (primary), `#150f23` (deeper)
 - Text: `#ffffff` (primary), `#e5e7eb` (secondary)
-- Interactive: `#6a5fc1` (links/hover), `#79628c` (buttons)
-- Accent: `#c2ef4e` (lime highlight), `#ffb287` (coral focus)
+- Interactive: `#6a5fc1` (links/hover), `rgb(225, 86, 124)` (primary buttons)
+- Accent: `#c2ef4e` (lime highlight), `#ffb287` (coral focus), `rgb(225, 86, 124)` (primary accent)
 - Border: `#362d59` (dark), `#cfcfdb` (light context)
 
 ### Example Component Prompts
 - "Create a hero section on deep purple background (#1f1633). Headline at 88px Dammit Sans weight 700, line-height 1.20, white text. Sub-text at 16px Rubik weight 400, line-height 1.50. White solid CTA button (8px radius, 12px 16px padding), hover transitions to #6a5fc1."
 - "Design a navigation bar: transparent over dark background. Rubik 15px weight 500, white text. Uppercase category labels with 0.2px letter-spacing. Hover color #6a5fc1."
-- "Build a primary button: background #79628c, border 1px solid #584674, inset shadow rgba(0,0,0,0.1) 0px 1px 3px, white uppercase text at 14px Rubik weight 700, letter-spacing 0.2px, radius 13px. Hover: shadow rgba(0,0,0,0.18) 0px 0.5rem 1.5rem."
+- "Build a primary button: background rgb(225, 86, 124), border 1px solid rgb(187, 69, 102), inset shadow rgba(0,0,0,0.1) 0px 1px 3px, white uppercase text at 14px Rubik weight 700, letter-spacing 0.2px, radius 13px. Hover: background rgb(207, 76, 114), shadow rgba(225, 86, 124, 0.26)."
 - "Create a glass card panel: background rgba(255,255,255,0.18), backdrop-filter blur(18px) saturate(180%), radius 12px. White text content inside."
 - "Design a feature section: #150f23 background, 24px Rubik weight 500 heading, 16px Rubik weight 400 body text. 14px uppercase lime-green (#c2ef4e) label above heading."
 
