@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import HomePage from './pages/home/HomePage'
 import { CreateQuizPage } from './pages/create-quiz/CreateQuizPage'
+import { JoinQuizPage } from './pages/join-quiz/JoinQuizPage'
 
 export default function App() {
   const [pathname, setPathname] = useState(() => window.location.pathname)
@@ -21,6 +22,10 @@ export default function App() {
 
   if (pathname === '/create-quiz') {
     return <CreateQuizPage onGoHome={() => navigate('/')} />
+  }
+
+  if (pathname === '/join-quiz') {
+    return <JoinQuizPage />
   }
 
   return <HomePage onCreateQuiz={() => navigate('/create-quiz')} />

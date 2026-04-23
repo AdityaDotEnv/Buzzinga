@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Icon } from '../ui/Icon'
+import buzzingaLogo from '../../assets/buzzinga-logo.png'
 
 export type NavLink = {
   label: string
@@ -19,7 +20,7 @@ type NavbarProps = {
 const defaultLinks: NavLink[] = [
   { label: 'Home', href: '/' },
   { label: 'Create Quiz', href: '/create-quiz' },
-  { label: 'Join Quiz', href: '#join' },
+  { label: 'Join Quiz', href: '/join-quiz' },
   { label: 'Explore Quizzes', href: '#explore' },
   { label: 'Leaderboards', href: '#leaderboards' },
 ]
@@ -36,10 +37,7 @@ export function Navbar({
   return (
     <header className="navbar">
       <a className="brand" href={brandHref} aria-label="Buzzinga home">
-        <span className="brand-mark">B</span>
-        <span className="brand-copy">
-          Buzzinga<span aria-hidden="true">!</span>
-        </span>
+        <img className="brand-logo" src={buzzingaLogo} alt="Buzzinga" />
       </a>
 
       <nav className="nav-links" aria-label="Primary navigation">
@@ -82,7 +80,7 @@ export function Navbar({
 
       <div className="mobile-drawer" role="dialog" aria-modal="true" aria-label="Mobile navigation" hidden={!mobileMenuOpen}>
         <div className="mobile-drawer-header">
-          <span className="brand-copy">Buzzinga!</span>
+          <img className="brand-logo" src={buzzingaLogo} alt="Buzzinga" />
           <button className="icon-button" type="button" onClick={onToggleMobileMenu} aria-label="Close menu">
             <Icon name="close" />
           </button>

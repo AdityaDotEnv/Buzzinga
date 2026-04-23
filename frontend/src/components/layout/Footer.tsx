@@ -1,10 +1,11 @@
+import buzzingaLogo from '../../assets/buzzinga-logo.png'
+
 export function Footer() {
   return (
     <footer className="footer">
       <div className="footer-brand">
         <a className="brand" href="/" aria-label="Buzzinga home">
-          <span className="brand-mark">B</span>
-          <span className="brand-copy">Buzzinga!</span>
+          <img className="brand-logo" src={buzzingaLogo} alt="Buzzinga" />
         </a>
         <p>Competitive quizzes with classroom-grade clarity and game-night energy.</p>
       </div>
