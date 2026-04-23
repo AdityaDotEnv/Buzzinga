@@ -14,7 +14,7 @@ export function CreateQuizHero({ selectedMode, onSelectMode, onStartScratch, onS
   const activeMode = creationModes.find((mode) => mode.id === selectedMode) ?? creationModes[0]
 
   return (
-    <section className="create-quiz-hero">
+    <section className="create-quiz-hero" id="overview">
       <div className="create-quiz-hero-copy">
         <span className="eyebrow">Create quiz</span>
         <h1>Build a quiz faster than the clock starts.</h1>

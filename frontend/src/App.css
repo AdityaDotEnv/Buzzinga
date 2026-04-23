@@ -118,6 +118,10 @@
   position: relative;
 }
 
+.workspace-menu {
+  position: relative;
+}
+
 .profile-menu summary {
   list-style: none;
   display: inline-flex;
@@ -129,6 +133,33 @@
 
 .profile-menu summary::-webkit-details-marker {
   display: none;
+}
+
+.workspace-menu summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.workspace-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.workspace-menu summary::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  margin-left: 2px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-1px);
+  transition: transform 180ms ease;
+}
+
+.workspace-menu[open] summary::after {
+  transform: rotate(225deg) translateY(1px);
 }
 
 .menu-panel {
@@ -152,6 +183,31 @@
 
 .menu-panel a:hover {
   background: rgba(255, 255, 255, 0.06);
+}
+
+.workspace-menu-panel {
+  min-width: 210px;
+}
+
+.workspace-menu-panel button,
+.workspace-menu-panel a {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: rgba(226, 232, 240, 0.92);
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.workspace-menu-panel button:hover,
+.workspace-menu-panel a:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
 }
 
 .ghost-button,
@@ -1084,10 +1140,6 @@ h1 {
   bottom: 12%;
   left: -180px;
   background: radial-gradient(circle, rgba(194, 239, 78, 0.16), rgba(194, 239, 78, 0));
-}
-
-.create-quiz-navbar {
-  gap: 16px;
 }
 
 .create-quiz-navbar-copy {

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import '../../App.css'
-import { Navbar } from '../home/sections/Navbar'
-import { MobileDrawer } from '../home/sections/MobileDrawer'
+import { Navbar } from '../../components/layout/Navbar'
 import { NoticeBar } from '../home/sections/NoticeBar'
 import { CreateQuizHero } from './sections/CreateQuizHero'
 import { CreationModes } from './sections/CreationModes'
@@ -19,11 +18,10 @@ export function CreateQuizPage({ onGoHome }: CreateQuizPageProps) {
   const [notice, setNotice] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const createLinks = [
-    { label: 'Overview', href: '#' },
-    { label: 'Scratch', href: '#' },
-    { label: 'AI Studio', href: '#' },
-    { label: 'Templates', href: '#' },
-    { label: 'Publish', href: '#' },
+    { label: 'Overview', href: '#overview' },
+    { label: 'Scratch', href: '#scratch' },
+    { label: 'AI Studio', href: '#ai-studio' },
+    { label: 'Templates', href: '#templates' },
   ]
 
   const handleAction = (message: string) => {
@@ -42,10 +40,23 @@ export function CreateQuizPage({ onGoHome }: CreateQuizPageProps) {
         mobileMenuOpen={mobileMenuOpen}
         onToggleMobileMenu={() => setMobileMenuOpen((value) => !value)}
         onLaunch={() => undefined}
-        links={createLinks}
+        mobileLinks={createLinks}
         brandHref="/"
+        rightContent={
+          <details className="workspace-menu">
+            <summary className="ghost-button workspace-trigger">Workspace</summary>
+            <div className="menu-panel workspace-menu-panel">
+              <button type="button" onClick={onGoHome}>
+                Back to home
+              </button>
+              <a href="#overview">Overview</a>
+              <a href="#scratch">Scratch</a>
+              <a href="#ai-studio">AI Studio</a>
+              <a href="#templates">Templates</a>
+            </div>
+          </details>
+        }
       />
-      <MobileDrawer open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} onLaunch={() => undefined} links={createLinks} />
 
       <main className="create-quiz-main">
         <CreateQuizHero

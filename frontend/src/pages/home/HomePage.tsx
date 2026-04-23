@@ -4,8 +4,7 @@ import { taglines } from './content'
 import { Footer } from './sections/Footer'
 import { FeaturesSection } from './sections/FeaturesSection'
 import { HeroSection } from './sections/HeroSection'
-import { MobileDrawer } from './sections/MobileDrawer'
-import { Navbar } from './sections/Navbar'
+import { Navbar } from '../../components/layout/Navbar'
 import { NoticeBar } from './sections/NoticeBar'
 import { ExploreSection } from './sections/ExploreSection'
 import { SocialProofSection } from './sections/SocialProofSection'
@@ -63,7 +62,6 @@ function HomePage({ onCreateQuiz }: HomePageProps) {
       </div>
 
       <Navbar mobileMenuOpen={mobileMenuOpen} onToggleMobileMenu={() => setMobileMenuOpen((value) => !value)} onLaunch={handleLaunch} />
-      <MobileDrawer open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} onLaunch={handleLaunch} />
 
       <main id="home">
         <HeroSection

@@ -9,7 +9,7 @@ type CreationModesProps = {
 
 export function CreationModes({ selectedMode, onSelectMode }: CreationModesProps) {
   return (
-    <section className="create-quiz-section" aria-labelledby="creation-methods-title">
+    <section className="create-quiz-section" id="scratch" aria-labelledby="creation-methods-title">
       <div className="section-heading">
         <span className="eyebrow">Ways to start</span>
         <h2 id="creation-methods-title">Pick a creation path that matches your pace.</h2>

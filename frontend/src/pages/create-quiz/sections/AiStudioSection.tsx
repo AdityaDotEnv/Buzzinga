@@ -6,7 +6,7 @@ type AiStudioSectionProps = {
 
 export function AiStudioSection({ onGenerate }: AiStudioSectionProps) {
   return (
-    <section className="create-quiz-section" aria-labelledby="ai-studio-title">
+    <section className="create-quiz-section" id="ai-studio" aria-labelledby="ai-studio-title">
       <div className="section-heading section-heading-tight">
         <span className="eyebrow">AI Studio</span>
         <h2 id="ai-studio-title">Describe the quiz. Let the draft appear.</h2>
@@ -46,8 +46,7 @@ export function AiStudioSection({ onGenerate }: AiStudioSectionProps) {
             ))}
           </ul>
           <p>
-            The backend comes later. This frontend already gives you a working creation flow, strong visual hierarchy,
-            and a clear edit path.
+            Build your quiz your way, with a clear path from first question to final game.
           </p>
         </article>
       </div>

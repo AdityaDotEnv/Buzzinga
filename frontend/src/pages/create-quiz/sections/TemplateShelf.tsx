@@ -2,7 +2,7 @@ import { templates } from '../content'
 
 export function TemplateShelf() {
   return (
-    <section className="create-quiz-section" aria-labelledby="template-shelf-title">
+    <section className="create-quiz-section" id="templates" aria-labelledby="template-shelf-title">
       <div className="section-heading">
         <span className="eyebrow">Templates</span>
         <h2 id="template-shelf-title">Kick off from a proven quiz shape.</h2>
