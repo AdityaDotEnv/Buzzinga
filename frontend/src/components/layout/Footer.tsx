@@ -1,44 +1,79 @@
+import { Link } from 'react-router-dom'
 import buzzingaLogo from '../../assets/buzzinga-logo.png'
+
+type FooterLink = {
+  label: string
+  href: string
+}
+
+const footerColumns: Array<{ title: string; links: FooterLink[] }> = [
+  {
+    title: 'Product',
+    links: [
+      { label: 'Create Quiz', href: '/create-quiz' },
+      { label: 'Join Game', href: '/join-quiz' },
+      { label: 'Leaderboards', href: '#leaderboards' },
+      { label: 'Analytics', href: '#' },
+    ],
+  },
+  {
+    title: 'Solutions',
+    links: [
+      { label: 'Classroom Mode', href: '#' },
+      { label: 'Team Battles', href: '#' },
+      { label: 'Events', href: '#' },
+      { label: 'Community Play', href: '#' },
+    ],
+  },
+  {
+    title: 'Resources',
+    links: [
+      { label: 'Help Center', href: '#' },
+      { label: 'Templates', href: '#' },
+      { label: 'Guides', href: '#' },
+      { label: 'Status', href: '#' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About', href: '#' },
+      { label: 'Careers', href: '#' },
+      { label: 'Contact', href: '#' },
+      { label: 'Privacy', href: '#' },
+    ],
+  },
+]
+
+function renderFooterLink(link: FooterLink) {
+  return link.href.startsWith('/') ? (
+    <Link key={link.label} to={link.href}>
+      {link.label}
+    </Link>
+  ) : (
+    <a key={link.label} href={link.href}>
+      {link.label}
+    </a>
+  )
+}
 
 export function Footer() {
   return (
     <footer className="footer">
       <div className="footer-brand">
-        <a className="brand" href="/" aria-label="Buzzinga home">
+        <Link className="brand" to="/" aria-label="Buzzinga home">
           <img className="brand-logo" src={buzzingaLogo} alt="Buzzinga" />
-        </a>
+        </Link>
         <p>Competitive quizzes with classroom-grade clarity and game-night energy.</p>
       </div>
 
       <div className="footer-columns">
-        <div>
-          <h3>Product</h3>
-          <a href="#">Create Quiz</a>
-          <a href="#">Join Game</a>
-          <a href="#">Leaderboards</a>
-          <a href="#">Analytics</a>
-        </div>
-        <div>
-          <h3>Solutions</h3>
-          <a href="#">Classroom Mode</a>
-          <a href="#">Team Battles</a>
-          <a href="#">Events</a>
-          <a href="#">Community Play</a>
-        </div>
-        <div>
-          <h3>Resources</h3>
-          <a href="#">Help Center</a>
-          <a href="#">Templates</a>
-          <a href="#">Guides</a>
-          <a href="#">Status</a>
-        </div>
-        <div>
-          <h3>Company</h3>
-          <a href="#">About</a>
-          <a href="#">Careers</a>
-          <a href="#">Contact</a>
-          <a href="#">Privacy</a>
-        </div>
+        {footerColumns.map((column) => (
+          <div key={column.title}>
+            <h3>{column.title}</h3>
+            {column.links.map(renderFooterLink)}
+          </div>
+        ))}
       </div>
     </footer>
   )

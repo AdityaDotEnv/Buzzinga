@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../../App.css'
 import { Footer } from '../../components/layout/Footer'
 import { Navbar } from '../../components/layout/Navbar'
@@ -9,14 +10,11 @@ import { AiStudioSection } from './sections/AiStudioSection'
 import { TemplateShelf } from './sections/TemplateShelf'
 import type { CreationMode } from './types'
 
-type CreateQuizPageProps = {
-  onGoHome: () => void
-}
-
-export function CreateQuizPage({ onGoHome }: CreateQuizPageProps) {
+export function CreateQuizPage() {
   const [selectedMode, setSelectedMode] = useState<CreationMode['id']>('scratch')
   const [notice, setNotice] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const navigate = useNavigate()
   const createLinks = [
     { label: 'Overview', href: '#overview' },
     { label: 'Scratch', href: '#scratch' },
@@ -46,7 +44,7 @@ export function CreateQuizPage({ onGoHome }: CreateQuizPageProps) {
           <details className="workspace-menu">
             <summary className="ghost-button workspace-trigger">Workspace</summary>
             <div className="menu-panel workspace-menu-panel">
-              <button type="button" onClick={onGoHome}>
+              <button type="button" onClick={() => navigate('/')}>
                 Back to home
               </button>
               <a href="#overview">Overview</a>
@@ -64,7 +62,7 @@ export function CreateQuizPage({ onGoHome }: CreateQuizPageProps) {
           onSelectMode={setSelectedMode}
           onStartScratch={() => handleAction('Scratch workspace opened')}
           onStartAi={() => handleAction('AI quiz builder opened')}
-          onGoHome={onGoHome}
+          onGoHome={() => navigate('/')}
         />
 
         <CreationModes selectedMode={selectedMode} onSelectMode={setSelectedMode} />

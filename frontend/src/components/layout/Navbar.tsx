@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
 import buzzingaLogo from '../../assets/buzzinga-logo.png'
 
@@ -31,21 +32,28 @@ export function Navbar({
   onLaunch,
   links = defaultLinks,
   mobileLinks = defaultLinks,
-  brandHref = '#home',
+  brandHref = '/',
   rightContent,
 }: NavbarProps) {
+  const renderNavLink = (link: NavLink) =>
+    link.href.startsWith('/') ? (
+      <Link key={link.label} to={link.href}>
+        {link.label}
+      </Link>
+    ) : (
+      <a key={link.label} href={link.href}>
+        {link.label}
+      </a>
+    )
+
   return (
     <header className="navbar">
-      <a className="brand" href={brandHref} aria-label="Buzzinga home">
+      <Link className="brand" to={brandHref} aria-label="Buzzinga home">
         <img className="brand-logo" src={buzzingaLogo} alt="Buzzinga" />
-      </a>
+      </Link>
 
       <nav className="nav-links" aria-label="Primary navigation">
-        {links.map((link) => (
-          <a key={link.label} href={link.href}>
-            {link.label}
-          </a>
-        ))}
+        {links.map(renderNavLink)}
       </nav>
 
       <div className="nav-actions">
@@ -85,11 +93,17 @@ export function Navbar({
             <Icon name="close" />
           </button>
         </div>
-        {mobileLinks.map((link) => (
-          <a key={link.label} href={link.href} onClick={onToggleMobileMenu}>
-            {link.label}
-          </a>
-        ))}
+        {mobileLinks.map((link) =>
+          link.href.startsWith('/') ? (
+            <Link key={link.label} to={link.href} onClick={onToggleMobileMenu}>
+              {link.label}
+            </Link>
+          ) : (
+            <a key={link.label} href={link.href} onClick={onToggleMobileMenu}>
+              {link.label}
+            </a>
+          ),
+        )}
         <div className="mobile-drawer-actions">
           <a className="ghost-button" href="#login">
             Log in

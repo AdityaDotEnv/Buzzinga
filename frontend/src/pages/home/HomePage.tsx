@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../../App.css'
 import { taglines } from './content'
 import { FeaturesSection } from './sections/FeaturesSection'
@@ -11,15 +12,12 @@ import { SocialProofSection } from './sections/SocialProofSection'
 import { TimelineSection } from './sections/TimelineSection'
 import { CtaSection } from './sections/CtaSection'
 
-type HomePageProps = {
-  onCreateQuiz: () => void
-}
-
-function HomePage({ onCreateQuiz }: HomePageProps) {
+function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [taglineIndex, setTaglineIndex] = useState(0)
   const [gameCode, setGameCode] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -70,13 +68,13 @@ function HomePage({ onCreateQuiz }: HomePageProps) {
           onGameCodeChange={setGameCode}
           onJoin={handleJoin}
           onLaunch={handleLaunch}
-          onOpenCreateQuiz={onCreateQuiz}
+          onOpenCreateQuiz={() => navigate('/create-quiz')}
         />
         <SocialProofSection />
         <FeaturesSection />
         <TimelineSection />
         <ExploreSection />
-        <CtaSection onLaunch={handleLaunch} onOpenCreateQuiz={onCreateQuiz} />
+        <CtaSection onLaunch={handleLaunch} onOpenCreateQuiz={() => navigate('/create-quiz')} />
       </main>
 
       <Footer />
