@@ -12,7 +12,11 @@ import { SocialProofSection } from './sections/SocialProofSection'
 import { TimelineSection } from './sections/TimelineSection'
 import { CtaSection } from './sections/CtaSection'
 
-function HomePage() {
+type HomePageProps = {
+  onCreateQuiz: () => void
+}
+
+function HomePage({ onCreateQuiz }: HomePageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [taglineIndex, setTaglineIndex] = useState(0)
   const [gameCode, setGameCode] = useState('')
@@ -68,12 +72,13 @@ function HomePage() {
           onGameCodeChange={setGameCode}
           onJoin={handleJoin}
           onLaunch={handleLaunch}
+          onOpenCreateQuiz={onCreateQuiz}
         />
         <SocialProofSection />
         <FeaturesSection />
         <TimelineSection />
         <ExploreSection />
-        <CtaSection onLaunch={handleLaunch} />
+        <CtaSection onLaunch={handleLaunch} onOpenCreateQuiz={onCreateQuiz} />
       </main>
 
       <Footer />

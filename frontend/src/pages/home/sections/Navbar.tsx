@@ -1,15 +1,30 @@
 import { Icon } from '../../../components/ui/Icon'
 
+type NavLink = {
+  label: string
+  href: string
+}
+
 type NavbarProps = {
   mobileMenuOpen: boolean
   onToggleMobileMenu: () => void
   onLaunch: (message: string) => void
+  links?: NavLink[]
+  brandHref?: string
 }
 
-export function Navbar({ mobileMenuOpen, onToggleMobileMenu, onLaunch }: NavbarProps) {
+const defaultLinks: NavLink[] = [
+  { label: 'Home', href: '#home' },
+  { label: 'Create Quiz', href: '/create-quiz' },
+  { label: 'Join Quiz', href: '#join' },
+  { label: 'Explore Quizzes', href: '#explore' },
+  { label: 'Leaderboards', href: '#leaderboards' },
+]
+
+export function Navbar({ mobileMenuOpen, onToggleMobileMenu, onLaunch, links = defaultLinks, brandHref = '#home' }: NavbarProps) {
   return (
     <header className="navbar">
-      <a className="brand" href="#home" aria-label="Buzzinga home">
+      <a className="brand" href={brandHref} aria-label="Buzzinga home">
         <span className="brand-mark">B</span>
         <span className="brand-copy">
           Buzzinga<span aria-hidden="true">!</span>
@@ -17,11 +32,11 @@ export function Navbar({ mobileMenuOpen, onToggleMobileMenu, onLaunch }: NavbarP
       </a>
 
       <nav className="nav-links" aria-label="Primary navigation">
-        <a href="#home">Home</a>
-        <a href="#create">Create Quiz</a>
-        <a href="#join">Join Quiz</a>
-        <a href="#explore">Explore Quizzes</a>
-        <a href="#leaderboards">Leaderboards</a>
+        {links.map((link) => (
+          <a key={link.label} href={link.href}>
+            {link.label}
+          </a>
+        ))}
       </nav>
 
       <div className="nav-actions">

@@ -4,9 +4,18 @@ type MobileDrawerProps = {
   open: boolean
   onClose: () => void
   onLaunch: (message: string) => void
+  links?: { label: string; href: string }[]
 }
 
-export function MobileDrawer({ open, onClose, onLaunch }: MobileDrawerProps) {
+const defaultLinks = [
+  { label: 'Home', href: '#home' },
+  { label: 'Create Quiz', href: '/create-quiz' },
+  { label: 'Join Quiz', href: '#join' },
+  { label: 'Explore Quizzes', href: '#explore' },
+  { label: 'Leaderboards', href: '#leaderboards' },
+]
+
+export function MobileDrawer({ open, onClose, onLaunch, links = defaultLinks }: MobileDrawerProps) {
   if (!open) return null
 
   return (
@@ -17,21 +26,11 @@ export function MobileDrawer({ open, onClose, onLaunch }: MobileDrawerProps) {
           <Icon name="close" />
         </button>
       </div>
-      <a href="#home" onClick={onClose}>
-        Home
-      </a>
-      <a href="#create" onClick={onClose}>
-        Create Quiz
-      </a>
-      <a href="#join" onClick={onClose}>
-        Join Quiz
-      </a>
-      <a href="#explore" onClick={onClose}>
-        Explore Quizzes
-      </a>
-      <a href="#leaderboards" onClick={onClose}>
-        Leaderboards
-      </a>
+      {links.map((link) => (
+        <a key={link.label} href={link.href} onClick={onClose}>
+          {link.label}
+        </a>
+      ))}
       <div className="mobile-drawer-actions">
         <a className="ghost-button" href="#login">
           Log in

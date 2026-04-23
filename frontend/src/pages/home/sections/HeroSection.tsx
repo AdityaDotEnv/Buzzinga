@@ -8,9 +8,17 @@ type HeroSectionProps = {
   onGameCodeChange: (value: string) => void
   onJoin: (event: FormEvent<HTMLFormElement>) => void
   onLaunch: (message: string) => void
+  onOpenCreateQuiz: () => void
 }
 
-export function HeroSection({ tagline, gameCode, onGameCodeChange, onJoin, onLaunch }: HeroSectionProps) {
+export function HeroSection({
+  tagline,
+  gameCode,
+  onGameCodeChange,
+  onJoin,
+  onLaunch,
+  onOpenCreateQuiz,
+}: HeroSectionProps) {
   return (
     <section className="hero-section" id="create">
       <div className="hero-copy">
@@ -32,7 +40,7 @@ export function HeroSection({ tagline, gameCode, onGameCodeChange, onJoin, onLau
         </p>
 
         <div className="hero-actions" id="join">
-          <button className="primary-button primary-button-large" type="button" onClick={() => onLaunch('Quiz builder opened')}>
+          <button className="primary-button primary-button-large" type="button" onClick={onOpenCreateQuiz}>
             Start Creating
           </button>
           <button className="secondary-button secondary-button-large" type="button" onClick={() => onLaunch('Quick join opened')}>

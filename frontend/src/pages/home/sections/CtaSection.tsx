@@ -1,8 +1,9 @@
 type CtaSectionProps = {
   onLaunch: (message: string) => void
+  onOpenCreateQuiz: () => void
 }
 
-export function CtaSection({ onLaunch }: CtaSectionProps) {
+export function CtaSection({ onLaunch, onOpenCreateQuiz }: CtaSectionProps) {
   return (
     <section className="cta-section">
       <div className="cta-card glass-card">
@@ -13,7 +14,7 @@ export function CtaSection({ onLaunch }: CtaSectionProps) {
           take over.
         </p>
         <div className="hero-actions">
-          <button className="primary-button primary-button-large" type="button" onClick={() => onLaunch('Create quiz flow opened')}>
+          <button className="primary-button primary-button-large" type="button" onClick={onOpenCreateQuiz}>
             Create Quiz Free
           </button>
           <button className="secondary-button secondary-button-large" type="button" onClick={() => onLaunch('Join quiz flow opened')}>
