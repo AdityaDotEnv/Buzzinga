@@ -10,7 +10,6 @@ import { Footer } from '../../components/layout/Footer'
 import { NoticeBar } from './sections/NoticeBar'
 import { ExploreSection } from './sections/ExploreSection'
 import { SocialProofSection } from './sections/SocialProofSection'
-import { TimelineSection } from './sections/TimelineSection'
 import { CtaSection } from './sections/CtaSection'
 
 function HomePage() {
@@ -63,7 +62,7 @@ return (
       <Navbar mobileMenuOpen={mobileMenuOpen} onToggleMobileMenu={() => setMobileMenuOpen((value) => !value)} onLaunch={handleLaunch} />
 
       <main id="home">
-        <HeroSection
+<HeroSection
           tagline={taglines[taglineIndex]}
           gameCode={gameCode}
           onGameCodeChange={setGameCode}
@@ -73,7 +72,6 @@ return (
         />
         <SocialProofSection />
         <FeaturesSection />
-        <TimelineSection />
         <ExploreSection />
         <CtaSection onLaunch={handleLaunch} onOpenCreateQuiz={() => navigate('/create-quiz')} />
       </main>
