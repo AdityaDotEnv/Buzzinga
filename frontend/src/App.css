@@ -84,8 +84,8 @@
   height: 40px;
   border-radius: 14px;
   color: #ffffff;
-  background: linear-gradient(135deg, #79628c, #6a5fc1 60%, #c2ef4e);
-  box-shadow: 0 14px 30px rgba(22, 15, 36, 0.32);
+  background: linear-gradient(135deg, rgb(225, 86, 124), rgba(225, 86, 124, 0.82));
+  box-shadow: 0 14px 30px rgba(225, 86, 124, 0.32);
 }
 
 .brand-copy {
@@ -192,9 +192,13 @@
   border-radius: 14px;
   color: #fff;
   font-weight: 700;
-  background: #79628c;
-  border: 1px solid #584674;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 16px 30px rgba(22, 15, 36, 0.25);
+  background: rgb(225, 86, 124);
+  border: 1px solid rgb(187, 69, 102);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 16px 30px rgba(225, 86, 124, 0.26);
+}
+
+.primary-button:hover {
+  background: rgb(207, 76, 114);
 }
 
 .primary-button-large,
