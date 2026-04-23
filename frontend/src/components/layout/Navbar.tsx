@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
 import buzzingaLogo from '../../assets/buzzinga-logo.png'
+import styles from './Navbar.module.css'
 
 export type NavLink = {
   label: string
@@ -46,24 +47,24 @@ export function Navbar({
       </a>
     )
 
-  return (
-    <header className="navbar">
-      <Link className="brand" to={brandHref} aria-label="Buzzinga home">
-        <img className="brand-logo" src={buzzingaLogo} alt="Buzzinga" />
+return (
+    <header className={styles.navbar}>
+      <Link className={styles.brand} to={brandHref} aria-label="Buzzinga home">
+        <img className={styles.brandLogo} src={buzzingaLogo} alt="Buzzinga" />
       </Link>
 
-      <nav className="nav-links" aria-label="Primary navigation">
+      <nav className={styles.navLinks} aria-label="Primary navigation">
         {links.map(renderNavLink)}
       </nav>
 
-      <div className="nav-actions">
+      <div className={styles.navActions}>
         {rightContent}
-        <details className="profile-menu">
+        <details className={styles.profileMenu}>
           <summary>
-            <span className="avatar avatar-small">U</span>
+            <span className={`${styles.avatar} ${styles.avatarSmall}`}>U</span>
             Profile
           </summary>
-          <div className="menu-panel">
+          <div className={styles.menuPanel}>
             <a href="#">Dashboard</a>
             <a href="#">Achievements</a>
             <a href="#">Settings</a>
@@ -78,7 +79,7 @@ export function Navbar({
       </div>
 
       <button
-        className="icon-button mobile-toggle"
+        className={`icon-button ${styles.mobileToggle}`}
         type="button"
         aria-label="Open menu"
         onClick={onToggleMobileMenu}
@@ -86,9 +87,9 @@ export function Navbar({
         <Icon name={mobileMenuOpen ? 'close' : 'menu'} />
       </button>
 
-      <div className="mobile-drawer" role="dialog" aria-modal="true" aria-label="Mobile navigation" hidden={!mobileMenuOpen}>
-        <div className="mobile-drawer-header">
-          <img className="brand-logo" src={buzzingaLogo} alt="Buzzinga" />
+      <div className={styles.mobileDrawer} role="dialog" aria-modal="true" aria-label="Mobile navigation" hidden={!mobileMenuOpen}>
+        <div className={styles.mobileDrawerHeader}>
+          <img className={styles.brandLogo} src={buzzingaLogo} alt="Buzzinga" />
           <button className="icon-button" type="button" onClick={onToggleMobileMenu} aria-label="Close menu">
             <Icon name="close" />
           </button>
@@ -104,7 +105,7 @@ export function Navbar({
             </a>
           ),
         )}
-        <div className="mobile-drawer-actions">
+        <div className={styles.mobileDrawerActions}>
           <a className="ghost-button" href="#login">
             Log in
           </a>

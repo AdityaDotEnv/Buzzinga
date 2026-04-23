@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../../App.css'
+import styles from './HomePage.module.css'
 import { taglines } from './content'
 import { FeaturesSection } from './sections/FeaturesSection'
 import { HeroSection } from './sections/HeroSection'
@@ -51,12 +52,12 @@ function HomePage() {
     handleLaunch(`Joining room ${cleanCode}`)
   }
 
-  return (
-    <div className="app-shell">
-      <div className="app-background" aria-hidden="true">
-        <span className="orb orb-one" />
-        <span className="orb orb-two" />
-        <span className="grid" />
+return (
+    <div className={styles.appShell}>
+      <div className={styles.appBackground} aria-hidden="true">
+        <span className={styles.orbOne} />
+        <span className={styles.orbTwo} />
+        <span className={styles.grid} />
       </div>
 
       <Navbar mobileMenuOpen={mobileMenuOpen} onToggleMobileMenu={() => setMobileMenuOpen((value) => !value)} onLaunch={handleLaunch} />

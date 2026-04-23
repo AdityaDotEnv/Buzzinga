@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import buzzingaLogo from '../../assets/buzzinga-logo.png'
+import styles from './Footer.module.css'
 
 type FooterLink = {
   label: string
@@ -59,15 +60,15 @@ function renderFooterLink(link: FooterLink) {
 
 export function Footer() {
   return (
-    <footer className="footer">
-      <div className="footer-brand">
-        <Link className="brand" to="/" aria-label="Buzzinga home">
-          <img className="brand-logo" src={buzzingaLogo} alt="Buzzinga" />
+    <footer className={styles.footer}>
+      <div className={styles.footerBrand}>
+        <Link to="/" aria-label="Buzzinga home">
+          <img className={styles.brandLogo} src={buzzingaLogo} alt="Buzzinga" />
         </Link>
         <p>Competitive quizzes with classroom-grade clarity and game-night energy.</p>
       </div>
 
-      <div className="footer-columns">
+      <div className={styles.footerColumns}>
         {footerColumns.map((column) => (
           <div key={column.title}>
             <h3>{column.title}</h3>

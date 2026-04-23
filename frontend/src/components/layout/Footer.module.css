@@ -1,0 +1,72 @@
+.footer {
+  justify-content: space-between;
+  gap: 28px;
+  padding: 12px 0 0;
+  margin-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+}
+
+.footerBrand {
+  flex: 1;
+  display: grid;
+  gap: 14px;
+  max-width: 300px;
+}
+
+.brandLogo {
+  display: block;
+  width: auto;
+  height: 72px;
+}
+
+.footerBrand p {
+  color: rgba(226, 232, 240, 0.76);
+  line-height: 1.6;
+}
+
+.footerColumns {
+  flex: 1.6;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.footerColumns div {
+  display: grid;
+  gap: 10px;
+}
+
+.footerColumns h3 {
+  color: var(--color-text);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.footerColumns a {
+  width: fit-content;
+  color: rgba(226, 232, 240, 0.85);
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.footerColumns a:hover {
+  color: var(--color-text);
+}
+
+@media (max-width: 1100px) {
+  .footerColumns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 780px) {
+  .footer {
+    flex-direction: column;
+  }
+
+  .footerColumns {
+    grid-template-columns: 1fr;
+  }
+}
