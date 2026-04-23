@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import '../../App.css'
+import { Footer } from '../../components/layout/Footer'
 import { Navbar } from '../../components/layout/Navbar'
 import { NoticeBar } from '../home/sections/NoticeBar'
 import { CreateQuizHero } from './sections/CreateQuizHero'
 import { CreationModes } from './sections/CreationModes'
 import { AiStudioSection } from './sections/AiStudioSection'
 import { TemplateShelf } from './sections/TemplateShelf'
-import { CreateQuizFooter } from './sections/CreateQuizFooter'
 import type { CreationMode } from './types'
 
 type CreateQuizPageProps = {
@@ -72,7 +72,7 @@ export function CreateQuizPage({ onGoHome }: CreateQuizPageProps) {
         <TemplateShelf />
       </main>
 
-      <CreateQuizFooter onGoHome={onGoHome} />
+      <Footer />
       <NoticeBar notice={notice} />
     </div>
   )
