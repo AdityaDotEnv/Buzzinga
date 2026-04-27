@@ -45,8 +45,8 @@ export const templates: TemplateCard[] = [
 ]
 
 export const setupSteps = [
-  'Choose your format',
-  'Add prompts and answers',
-  'Tune scoring and pacing',
-  'Preview and publish',
+  { text: 'Choose your format', icon: 'Layout' },
+  { text: 'Add prompts and answers', icon: 'FileText' },
+  { text: 'Tune scoring and pacing', icon: 'Sliders' },
+  { text: 'Preview and publish', icon: 'Rocket' },
 ]
