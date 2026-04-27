@@ -5,6 +5,7 @@ import { Footer } from '../../components/layout/Footer'
 import { JoinHero } from '../../components/join/JoinHero'
 import { GamePinCard } from '../../components/join/GamePinCard'
 import { RoomPreviewCard } from '../../components/join/RoomPreviewCard'
+import { SuccessToast } from '../../components/join/SuccessToast'
 
 type JoinStatus = 'idle' | 'joining' | 'error'
 
@@ -12,6 +13,7 @@ export function JoinQuizPage() {
   const [gamePin, setGamePin] = useState('')
   const [nickname, setNickname] = useState('')
   const [joinStatus, setJoinStatus] = useState<JoinStatus>('idle')
+  const [showToast, setShowToast] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleJoin = async () => {
@@ -26,7 +28,7 @@ export function JoinQuizPage() {
     
     if (gamePin === '123456') {
       setJoinStatus('idle')
-      alert('Joined room!')
+      setShowToast(true)
     } else {
       setJoinStatus('error')
     }
@@ -34,6 +36,12 @@ export function JoinQuizPage() {
 
   return (
     <div className="app-shell min-h-screen flex flex-col bg-[#1f1633] text-white">
+      {showToast && (
+        <SuccessToast 
+          message={`Welcome, ${nickname || 'Player'}! Joining Science Trivia Night...`} 
+          onClose={() => setShowToast(false)} 
+        />
+      )}
       <div className="app-background" aria-hidden="true">
         <span className="orb orb-one" />
         <span className="orb orb-two" />
