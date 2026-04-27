@@ -12,7 +12,7 @@ export default function App() {
       <Route path="/create-quiz" element={<CreateQuizPage />} />
       <Route path="/create/manual" element={<ManualQuizBuilderPage />} />
       <Route path="/create/ai" element={<AIQuizGeneratorPage />} />
-      <Route path="/join-quiz" element={<JoinQuizPage />} />
+      <Route path="/join" element={<JoinQuizPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

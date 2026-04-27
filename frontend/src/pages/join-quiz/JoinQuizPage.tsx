@@ -1,80 +1,83 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import '../../App.css'
-import { Footer } from '../../components/layout/Footer'
 import { Navbar } from '../../components/layout/Navbar'
-import { NoticeBar } from '../home/sections/NoticeBar'
-import { JoinHero } from './sections/JoinHero'
-import { JoinGuidance } from './sections/JoinGuidance'
-import { JoinRooms } from './sections/JoinRooms'
-import { heroMessages } from './content'
+import { Footer } from '../../components/layout/Footer'
+import { JoinHero } from '../../components/join/JoinHero'
+import { GamePinCard } from '../../components/join/GamePinCard'
+import { RoomPreviewCard } from '../../components/join/RoomPreviewCard'
+import { SuccessToast } from '../../components/join/SuccessToast'
+
+type JoinStatus = 'idle' | 'joining' | 'error'
 
 export function JoinQuizPage() {
-  const [heroIndex, setHeroIndex] = useState(0)
-  const [roomCode, setRoomCode] = useState('')
-  const [playerName, setPlayerName] = useState('')
-  const [notice, setNotice] = useState<string | null>(null)
+  const [gamePin, setGamePin] = useState('')
+  const [nickname, setNickname] = useState('')
+  const [joinStatus, setJoinStatus] = useState<JoinStatus>('idle')
+  const [showToast, setShowToast] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setHeroIndex((current) => (current + 1) % heroMessages.length)
-    }, 3200)
-
-    return () => window.clearInterval(timer)
-  }, [])
-
-  useEffect(() => {
-    if (!notice) return
-
-    const timer = window.setTimeout(() => setNotice(null), 2800)
-    return () => window.clearTimeout(timer)
-  }, [notice])
-
-  const handleJoinNow = () => {
-    const cleanCode = roomCode.trim().toUpperCase()
-    const cleanName = playerName.trim()
-
-    if (!cleanCode) {
-      setNotice('Enter a room code to join')
+  const handleJoin = async () => {
+    if (!gamePin) {
+      setJoinStatus('error')
       return
     }
-
-    if (!cleanName) {
-      setNotice('Add a display name')
-      return
+    
+    setJoinStatus('joining')
+    // Simulate join flow
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    if (gamePin === '123456') {
+      setJoinStatus('idle')
+      setShowToast(true)
+    } else {
+      setJoinStatus('error')
     }
-
-    setNotice(`Joining room ${cleanCode} as ${cleanName}`)
   }
 
   return (
-    <div className="app-shell join-quiz-shell">
-      <div className="app-background join-quiz-background" aria-hidden="true">
-        <span className="orb orb-one join-orb-one" />
-        <span className="orb orb-two join-orb-two" />
+    <div className="app-shell min-h-screen flex flex-col bg-[#1f1633] text-white">
+      {showToast && (
+        <SuccessToast 
+          message={`Welcome, ${nickname || 'Player'}! Joining Science Trivia Night...`} 
+          onClose={() => setShowToast(false)} 
+        />
+      )}
+      <div className="app-background" aria-hidden="true">
+        <span className="orb orb-one" />
+        <span className="orb orb-two" />
         <span className="grid" />
       </div>
 
-      <Navbar mobileMenuOpen={mobileMenuOpen} onToggleMobileMenu={() => setMobileMenuOpen((value) => !value)} onLaunch={() => undefined} brandHref="/" />
+      <Navbar 
+        mobileMenuOpen={mobileMenuOpen} 
+        onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)} 
+        brandHref="/"
+        onLaunch={() => {}}
+      />
 
-      <main className="join-quiz-main">
-        <JoinHero
-          message={heroMessages[heroIndex]}
-          roomCode={roomCode}
-          playerName={playerName}
-          onRoomCodeChange={setRoomCode}
-          onPlayerNameChange={setPlayerName}
-          onSubmit={(event) => {
-            event.preventDefault()
-            handleJoinNow()
-          }}
-        />
-        <JoinGuidance />
-        <JoinRooms />
+      <main className="flex-grow flex flex-col items-center px-4 py-12 md:py-20 max-w-[1152px] mx-auto w-full gap-16 md:gap-24">
+        <JoinHero />
+        
+        <div className="w-full max-w-md flex flex-col gap-12">
+          <GamePinCard 
+            gamePin={gamePin}
+            nickname={nickname}
+            onPinChange={setGamePin}
+            onNicknameChange={setNickname}
+            onJoin={handleJoin}
+            status={joinStatus}
+          />
+          
+          <RoomPreviewCard />
+        </div>
+
+        <p className="text-gray-400 text-sm text-center">
+          Ask your host for the game PIN. <br />
+          You can join as a guest with a nickname.
+        </p>
       </main>
 
       <Footer />
-      <NoticeBar notice={notice} />
     </div>
   )
 }
