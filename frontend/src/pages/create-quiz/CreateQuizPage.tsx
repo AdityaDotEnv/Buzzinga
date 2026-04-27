@@ -1,32 +1,31 @@
-import { useState } from 'react'
-import '../../App.css'
-import { Footer } from '../../components/layout/Footer'
-import { Navbar } from '../../components/layout/Navbar'
-import { NoticeBar } from '../home/sections/NoticeBar'
-import { CreateQuizHero } from './sections/CreateQuizHero'
-import { CreationModes } from './sections/CreationModes'
-import { AiStudioSection } from './sections/AiStudioSection'
-import { TemplateShelf } from './sections/TemplateShelf'
-import type { CreationMode } from './types'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "../../App.css";
+import { Footer } from "../../components/layout/Footer";
+import { Navbar } from "../../components/layout/Navbar";
+import { NoticeBar } from "../home/sections/NoticeBar";
+import { CreateQuizHero } from "./sections/CreateQuizHero";
+import { CreationModes } from "./sections/CreationModes";
+import { AiStudioSection } from "./sections/AiStudioSection";
+import { TemplateShelf } from "./sections/TemplateShelf";
+import type { CreationMode } from "./types";
 
-type CreateQuizPageProps = {
-  onGoHome: () => void
-}
-
-export function CreateQuizPage({ onGoHome }: CreateQuizPageProps) {
-  const [selectedMode, setSelectedMode] = useState<CreationMode['id']>('scratch')
-  const [notice, setNotice] = useState<string | null>(null)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+export function CreateQuizPage() {
+  const [selectedMode, setSelectedMode] =
+    useState<CreationMode["id"]>("scratch");
+  const [notice, setNotice] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
   const createLinks = [
-    { label: 'Overview', href: '#overview' },
-    { label: 'Scratch', href: '#scratch' },
-    { label: 'AI Studio', href: '#ai-studio' },
-    { label: 'Templates', href: '#templates' },
-  ]
+    { label: "Overview", href: "#overview" },
+    { label: "Scratch", href: "#scratch" },
+    { label: "AI Studio", href: "#ai-studio" },
+    { label: "Templates", href: "#templates" },
+  ];
 
   const handleAction = (message: string) => {
-    setNotice(message)
-  }
+    setNotice(message);
+  };
 
   return (
     <div className="app-shell create-quiz-shell">
@@ -44,9 +43,11 @@ export function CreateQuizPage({ onGoHome }: CreateQuizPageProps) {
         brandHref="/"
         rightContent={
           <details className="workspace-menu">
-            <summary className="ghost-button workspace-trigger">Workspace</summary>
+            <summary className="ghost-button workspace-trigger">
+              Workspace
+            </summary>
             <div className="menu-panel workspace-menu-panel">
-              <button type="button" onClick={onGoHome}>
+              <button type="button" onClick={() => navigate("/")}>
                 Back to home
               </button>
               <a href="#overview">Overview</a>
@@ -62,18 +63,23 @@ export function CreateQuizPage({ onGoHome }: CreateQuizPageProps) {
         <CreateQuizHero
           selectedMode={selectedMode}
           onSelectMode={setSelectedMode}
-          onStartScratch={() => handleAction('Scratch workspace opened')}
-          onStartAi={() => handleAction('AI quiz builder opened')}
-          onGoHome={onGoHome}
+          onStartScratch={() => navigate("/create/manual")}
+          onStartAi={() => navigate("/create/ai")}
+          onGoHome={() => navigate("/")}
         />
 
-        <CreationModes selectedMode={selectedMode} onSelectMode={setSelectedMode} />
-        <AiStudioSection onGenerate={() => handleAction('AI draft preview ready')} />
+        <CreationModes
+          selectedMode={selectedMode}
+          onSelectMode={setSelectedMode}
+        />
+        <AiStudioSection
+          onGenerate={() => navigate("/create/ai")}
+        />
         <TemplateShelf />
       </main>
 
       <Footer />
       <NoticeBar notice={notice} />
     </div>
-  )
+  );
 }

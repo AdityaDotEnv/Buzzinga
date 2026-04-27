@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
+import buzzingaLogo from '../../assets/buzzinga-logo.png'
+import styles from './Navbar.module.css'
 
 export type NavLink = {
   label: string
@@ -19,7 +22,7 @@ type NavbarProps = {
 const defaultLinks: NavLink[] = [
   { label: 'Home', href: '/' },
   { label: 'Create Quiz', href: '/create-quiz' },
-  { label: 'Join Quiz', href: '#join' },
+  { label: 'Join Quiz', href: '/join-quiz' },
   { label: 'Explore Quizzes', href: '#explore' },
   { label: 'Leaderboards', href: '#leaderboards' },
 ]
@@ -30,34 +33,38 @@ export function Navbar({
   onLaunch,
   links = defaultLinks,
   mobileLinks = defaultLinks,
-  brandHref = '#home',
+  brandHref = '/',
   rightContent,
 }: NavbarProps) {
-  return (
-    <header className="navbar">
-      <a className="brand" href={brandHref} aria-label="Buzzinga home">
-        <span className="brand-mark">B</span>
-        <span className="brand-copy">
-          Buzzinga<span aria-hidden="true">!</span>
-        </span>
+  const renderNavLink = (link: NavLink) =>
+    link.href.startsWith('/') ? (
+      <Link key={link.label} to={link.href}>
+        {link.label}
+      </Link>
+    ) : (
+      <a key={link.label} href={link.href}>
+        {link.label}
       </a>
+    )
 
-      <nav className="nav-links" aria-label="Primary navigation">
-        {links.map((link) => (
-          <a key={link.label} href={link.href}>
-            {link.label}
-          </a>
-        ))}
+return (
+    <header className={styles.navbar}>
+      <Link className={styles.brand} to={brandHref} aria-label="Buzzinga home">
+        <img className={styles.brandLogo} src={buzzingaLogo} alt="Buzzinga" />
+      </Link>
+
+      <nav className={styles.navLinks} aria-label="Primary navigation">
+        {links.map(renderNavLink)}
       </nav>
 
-      <div className="nav-actions">
+      <div className={styles.navActions}>
         {rightContent}
-        <details className="profile-menu">
+        <details className={styles.profileMenu}>
           <summary>
-            <span className="avatar avatar-small">U</span>
+            <span className={`${styles.avatar} ${styles.avatarSmall}`}>U</span>
             Profile
           </summary>
-          <div className="menu-panel">
+          <div className={styles.menuPanel}>
             <a href="#">Dashboard</a>
             <a href="#">Achievements</a>
             <a href="#">Settings</a>
@@ -72,7 +79,7 @@ export function Navbar({
       </div>
 
       <button
-        className="icon-button mobile-toggle"
+        className={`icon-button ${styles.mobileToggle}`}
         type="button"
         aria-label="Open menu"
         onClick={onToggleMobileMenu}
@@ -80,19 +87,25 @@ export function Navbar({
         <Icon name={mobileMenuOpen ? 'close' : 'menu'} />
       </button>
 
-      <div className="mobile-drawer" role="dialog" aria-modal="true" aria-label="Mobile navigation" hidden={!mobileMenuOpen}>
-        <div className="mobile-drawer-header">
-          <span className="brand-copy">Buzzinga!</span>
+      <div className={styles.mobileDrawer} role="dialog" aria-modal="true" aria-label="Mobile navigation" hidden={!mobileMenuOpen}>
+        <div className={styles.mobileDrawerHeader}>
+          <img className={styles.brandLogo} src={buzzingaLogo} alt="Buzzinga" />
           <button className="icon-button" type="button" onClick={onToggleMobileMenu} aria-label="Close menu">
             <Icon name="close" />
           </button>
         </div>
-        {mobileLinks.map((link) => (
-          <a key={link.label} href={link.href} onClick={onToggleMobileMenu}>
-            {link.label}
-          </a>
-        ))}
-        <div className="mobile-drawer-actions">
+        {mobileLinks.map((link) =>
+          link.href.startsWith('/') ? (
+            <Link key={link.label} to={link.href} onClick={onToggleMobileMenu}>
+              {link.label}
+            </Link>
+          ) : (
+            <a key={link.label} href={link.href} onClick={onToggleMobileMenu}>
+              {link.label}
+            </a>
+          ),
+        )}
+        <div className={styles.mobileDrawerActions}>
           <a className="ghost-button" href="#login">
             Log in
           </a>

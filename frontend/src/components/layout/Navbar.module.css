@@ -1,0 +1,223 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  justify-content: space-between;
+  padding: 14px 18px;
+  position: sticky;
+  top: 12px;
+  z-index: 20;
+  backdrop-filter: blur(22px) saturate(180%);
+  background: rgba(7, 11, 24, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(2, 6, 23, 0.35);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.brandLogo {
+  display: block;
+  width: auto;
+  height: 72px;
+}
+
+.navLinks,
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.navLinks a,
+.mobileDrawer a,
+.footerColumns a {
+  color: rgba(226, 232, 240, 0.85);
+  text-decoration: none;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.navLinks a:hover,
+.mobileDrawer a:hover,
+.footerColumns a:hover {
+  color: var(--color-text);
+  transform: translateY(-1px);
+}
+
+/* Profile menu */
+.profileMenu {
+  position: relative;
+}
+
+.profileMenu summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: #e2e8f0;
+}
+
+.profileMenu summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Workspace menu */
+.workspaceMenu {
+  position: relative;
+}
+
+.workspaceMenu summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.workspaceMenu summary::-webkit-details-marker {
+  display: none;
+}
+
+.workspaceMenu summary::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  margin-left: 2px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-1px);
+  transition: transform 180ms ease;
+}
+
+.workspaceMenu[open] summary::after {
+  transform: rotate(225deg) translateY(1px);
+}
+
+/* Menu panel */
+.menuPanel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  min-width: 180px;
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+  display: grid;
+  gap: 6px;
+}
+
+.menuPanel a {
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+.menuPanel a:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.workspaceMenuPanel {
+  min-width: 210px;
+}
+
+.workspaceMenuPanel button,
+.workspaceMenuPanel a {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: rgba(226, 232, 240, 0.92);
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.workspaceMenuPanel button:hover,
+.workspaceMenuPanel a:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text);
+}
+
+.mobileToggle {
+  display: none;
+}
+
+/* Mobile drawer */
+.mobileDrawer {
+  position: fixed;
+  inset: 88px 16px auto;
+  z-index: 30;
+  padding: 18px;
+  border-radius: 28px;
+  background: rgba(8, 12, 24, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 80px rgba(2, 6, 23, 0.55);
+  display: grid;
+  gap: 10px;
+}
+
+.mobileDrawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobileDrawerHeader .brandLogo {
+  height: 32px;
+}
+
+.mobileDrawer a {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mobileDrawerActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-top: 10px;
+}
+
+/* Avatar */
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  color: var(--color-text);
+  font-weight: 700;
+  background: linear-gradient(135deg, #a855f7, #22d3ee);
+  box-shadow: 0 10px 20px rgba(168, 85, 247, 0.25);
+}
+
+.avatarSmall {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+}
+
+@media (max-width: 1100px) {
+  .navLinks,
+  .navActions {
+    display: none;
+  }
+
+  .mobileToggle {
+    display: inline-grid;
+  }
+}

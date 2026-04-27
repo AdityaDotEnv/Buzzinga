@@ -1,4 +1,5 @@
 import { Icon } from '../../../components/ui/Icon'
+import buzzingaLogo from '../../../assets/buzzinga-logo.png'
 
 type MobileDrawerProps = {
   open: boolean
@@ -21,7 +22,7 @@ export function MobileDrawer({ open, onClose, onLaunch, links = defaultLinks }: 
   return (
     <div className="mobile-drawer" role="dialog" aria-modal="true" aria-label="Mobile navigation">
       <div className="mobile-drawer-header">
-        <span className="brand-copy">Buzzinga!</span>
+        <img className="brand-logo" src={buzzingaLogo} alt="Buzzinga" />
         <button className="icon-button" type="button" onClick={onClose} aria-label="Close menu">
           <Icon name="close" />
         </button>

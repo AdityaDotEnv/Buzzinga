@@ -1,0 +1,182 @@
+.createQuizShell {
+  padding-bottom: 56px;
+}
+
+.createQuizBackground .createOrbOne {
+  top: -140px;
+  right: -140px;
+  background: radial-gradient(circle, rgba(225, 86, 124, 0.28), rgba(225, 86, 124, 0));
+}
+
+.createQuizBackground .createOrbTwo {
+  bottom: 12%;
+  left: -180px;
+  background: radial-gradient(circle, rgba(194, 239, 78, 0.16), rgba(194, 239, 78, 0));
+}
+
+.createQuizNavbarCopy {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.createQuizNavbarNote {
+  color: rgba(226, 232, 240, 0.76);
+  font-size: 0.95rem;
+}
+
+.createQuizMain {
+  display: grid;
+  gap: 72px;
+  padding: 36px 0 0;
+}
+
+.createQuizHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 30px;
+  align-items: stretch;
+  min-height: calc(100vh - 170px);
+}
+
+.createQuizHeroCopy {
+  display: grid;
+  align-content: center;
+  gap: 22px;
+}
+
+.createQuizHeroCopy h1 {
+  margin: 0;
+  font-size: clamp(3.2rem, 6.2vw, 6rem);
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  max-width: 10.5ch;
+}
+
+.createQuizLead {
+  max-width: 58ch;
+  color: rgba(226, 232, 240, 0.8);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.createQuizHeroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.createQuizHeroActionsSecondaryRow {
+  gap: 10px;
+}
+
+.createQuizHeroVisual {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  border-radius: 32px;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(225, 86, 124, 0.18), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(103, 232, 249, 0.14), transparent 36%),
+    linear-gradient(180deg, rgba(17, 24, 39, 0.92), rgba(15, 23, 42, 0.86));
+}
+
+.heroVisualBanner {
+  display: grid;
+  gap: 8px;
+  padding: 22px;
+  border-radius: 28px;
+  color: var(--color-text);
+  box-shadow: 0 24px 70px rgba(2, 6, 23, 0.25);
+}
+
+.heroVisualKicker,
+.templateArt span,
+.createQuizChip,
+.heroModeChip span {
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.heroVisualBanner strong {
+  font-size: 1.25rem;
+  line-height: 1.45;
+  max-width: 28ch;
+}
+
+.heroModeStrip {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.heroModeChip,
+.modeCard,
+.createQuizChip {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.heroModeChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+}
+
+.heroModeChip svg,
+.modeIcon svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.heroModeChip.isActive {
+  background: rgba(225, 86, 124, 0.18);
+  border-color: rgba(225, 86, 124, 0.35);
+}
+
+.createQuizSection {
+  display: grid;
+  gap: 24px;
+}
+
+.createModeGrid,
+.templateGrid,
+.aiStudioGrid {
+  display: grid;
+  gap: 16px;
+}
+
+.createModeGrid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 780px) {
+  .createQuizMain {
+    gap: 56px;
+    padding-top: 28px;
+  }
+
+  .createQuizHero,
+  .templateGrid,
+  .createModeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .createQuizHeroCopy h1 {
+    font-size: clamp(2.8rem, 15vw, 4.2rem);
+  }
+
+  .heroModeStrip {
+    grid-template-columns: 1fr;
+  }
+}
