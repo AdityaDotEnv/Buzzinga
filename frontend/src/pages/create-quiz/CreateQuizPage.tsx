@@ -1,8 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
-import type { RootState } from '../../store/store'
-import { setSelectedMode } from '../../store/slices/createQuizSlice'
 import '../../App.css'
 import { Footer } from '../../components/layout/Footer'
 import { Navbar } from '../../components/layout/Navbar'
@@ -10,13 +7,11 @@ import { NoticeBar } from '../home/sections/NoticeBar'
 import { CreateQuizHero } from './sections/CreateQuizHero'
 import { CreationModes } from './sections/CreationModes'
 import { AiStudioSection } from './sections/AiStudioSection'
-import { ManualStudioSection } from './sections/ManualStudioSection'
 import { TemplateShelf } from './sections/TemplateShelf'
 import type { CreationMode } from './types'
 
 export function CreateQuizPage() {
-  const dispatch = useDispatch()
-  const selectedMode = useSelector((state: RootState) => state.createQuiz.selectedMode)
+  const [selectedMode, setSelectedMode] = useState<CreationMode['id']>('scratch')
   const [notice, setNotice] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
@@ -29,10 +24,6 @@ export function CreateQuizPage() {
 
   const handleAction = (message: string) => {
     setNotice(message)
-  }
-
-  const handleSelectMode = (mode: CreationMode['id']) => {
-    dispatch(setSelectedMode(mode))
   }
 
   return (
@@ -68,20 +59,14 @@ export function CreateQuizPage() {
       <main className="create-quiz-main">
         <CreateQuizHero
           selectedMode={selectedMode}
-          onSelectMode={handleSelectMode}
+          onSelectMode={setSelectedMode}
           onStartScratch={() => handleAction('Scratch workspace opened')}
           onStartAi={() => handleAction('AI quiz builder opened')}
           onGoHome={() => navigate('/')}
         />
 
-        <CreationModes selectedMode={selectedMode} onSelectMode={handleSelectMode} />
-        
-        {selectedMode === 'scratch' ? (
-          <ManualStudioSection onStart={() => handleAction('Manual builder ready')} />
-        ) : (
-          <AiStudioSection onGenerate={() => handleAction('AI draft preview ready')} />
-        )}
-        
+        <CreationModes selectedMode={selectedMode} onSelectMode={setSelectedMode} />
+        <AiStudioSection onGenerate={() => handleAction('AI draft preview ready')} />
         <TemplateShelf />
       </main>
 

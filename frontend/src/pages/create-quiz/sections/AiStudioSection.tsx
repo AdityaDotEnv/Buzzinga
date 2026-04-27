@@ -1,13 +1,4 @@
-import { Layout, FileText, Sliders, Rocket } from 'lucide-react'
 import { promptChips, setupSteps } from '../content'
-import styles from '../CreateQuizPage.module.css'
-
-const IconMap = {
-  Layout,
-  FileText,
-  Sliders,
-  Rocket
-}
 
 type AiStudioSectionProps = {
   onGenerate: () => void
@@ -15,15 +6,15 @@ type AiStudioSectionProps = {
 
 export function AiStudioSection({ onGenerate }: AiStudioSectionProps) {
   return (
-    <section className={styles.createQuizSection} id="ai-studio" aria-labelledby="ai-studio-title">
+    <section className="create-quiz-section" id="ai-studio" aria-labelledby="ai-studio-title">
       <div className="section-heading section-heading-tight">
         <span className="eyebrow">AI Studio</span>
         <h2 id="ai-studio-title">Describe the quiz. Let the draft appear.</h2>
       </div>
 
-      <div className={styles.aiStudioGrid}>
-        <article className={`${styles.aiStudioPanel} glass-card`}>
-          <div className={styles.aiStudioPanelHead}>
+      <div className="ai-studio-grid">
+        <article className="ai-studio-panel glass-card">
+          <div className="ai-studio-panel-head">
             <span className="card-kicker">Prompt</span>
             <span className="timer-badge success">Draft ready</span>
           </div>
@@ -34,9 +25,9 @@ export function AiStudioSection({ onGenerate }: AiStudioSectionProps) {
             aria-label="AI quiz prompt"
           />
 
-          <div className={styles.createQuizChipRow}>
+          <div className="create-quiz-chip-row">
             {promptChips.map((chip) => (
-              <button key={chip.label} type="button" className={styles.createQuizChip} title={chip.prompt}>
+              <button key={chip.label} type="button" className="create-quiz-chip" title={chip.prompt}>
                 {chip.label}
               </button>
             ))}
@@ -47,20 +38,12 @@ export function AiStudioSection({ onGenerate }: AiStudioSectionProps) {
           </button>
         </article>
 
-        <article className={`${styles.aiStudioNotes} glass-card`}>
+        <article className="ai-studio-notes glass-card">
           <span className="card-kicker">What you get</span>
-          <ul className={styles.aiStudioSteps}>
-            {setupSteps.map((step) => {
-              const StepIcon = IconMap[step.icon as keyof typeof IconMap]
-              return (
-                <li key={step.text} className="flex items-center gap-3">
-                  <span className={styles.stepIconWrapper}>
-                    <StepIcon size={18} />
-                  </span>
-                  {step.text}
-                </li>
-              )
-            })}
+          <ul>
+            {setupSteps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
           </ul>
           <p>
             Build your quiz your way, with a clear path from first question to final game.
