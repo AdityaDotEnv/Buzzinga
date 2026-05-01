@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { BuilderHero } from '../../components/manual-builder/BuilderHero';
 import { QuizMetadataPanel } from '../../components/manual-builder/QuizMetadataPanel';
 import { QuestionCanvas } from '../../components/manual-builder/QuestionCanvas';
@@ -11,39 +12,98 @@ export function ManualQuizBuilderPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="app-shell min-h-screen bg-[#080c18] text-slate-100 flex flex-col">
-      <div className="app-background fixed inset-0 pointer-events-none" aria-hidden="true">
-        <span className="orb orb-one bg-pink-500/10 blur-[120px] absolute w-[500px] h-[500px] rounded-full top-[-200px] right-[-100px]" />
-        <span className="orb orb-two bg-cyan-500/10 blur-[120px] absolute w-[600px] h-[600px] rounded-full bottom-[-200px] left-[-200px]" />
-        <span className="grid absolute inset-0 opacity-[0.03] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+    /*
+      Plain div — NOT app-shell/main — avoids the global
+      "main { display: grid }" rule that causes layout collapse.
+    */
+    <div style={{
+      minHeight: '100vh',
+      background: '#080c18',
+      color: '#f8fafc',
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative',
+      isolation: 'isolate',
+    }}>
+      {/* Background layer */}
+      <div aria-hidden="true" style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: 600, height: 600,
+          background: 'radial-gradient(circle, rgba(236,72,153,0.1), transparent 70%)',
+          top: -200, right: -100, filter: 'blur(60px)',
+        }} />
+        <div style={{
+          position: 'absolute', borderRadius: '50%',
+          width: 700, height: 700,
+          background: 'radial-gradient(circle, rgba(103,232,249,0.07), transparent 70%)',
+          bottom: -300, left: -200, filter: 'blur(60px)',
+        }} />
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'linear-gradient(rgba(148,163,184,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.03) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }} />
       </div>
 
-      <Navbar
-        mobileMenuOpen={false}
-        onToggleMobileMenu={() => {}}
-        onLaunch={() => {}}
-        brandHref="/"
-        rightContent={
-          <button onClick={() => navigate('/create-quiz')} className="ghost-button">
-            Exit Builder
-          </button>
-        }
-      />
+      {/* Navbar */}
+      <div style={{ position: 'relative', zIndex: 20 }}>
+        <Navbar
+          mobileMenuOpen={false}
+          onToggleMobileMenu={() => {}}
+          onLaunch={() => {}}
+          brandHref="/"
+          rightContent={
+            <button onClick={() => navigate('/create-quiz')} className="ghost-button">
+              Exit Builder
+            </button>
+          }
+        />
+      </div>
 
-      <main className="flex-1 relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
+      {/* Content — flex-col vertical flow, no <main> */}
+      <div style={{
+        position: 'relative', zIndex: 10,
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        maxWidth: 1400,
+        margin: '0 auto',
+        padding: '2.5rem 1.5rem 5rem',
+        boxSizing: 'border-box',
+        gap: '2rem',
+      }}>
+        {/* Row 1: Builder Hero */}
         <BuilderHero />
-        
-        <div className="flex flex-col xl:flex-row gap-6 items-start">
-          <div className="flex-1 flex flex-col gap-6 w-full min-w-0">
+
+        {/* Row 2: Canvas + Sidebar grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) 350px',
+          gap: '1.75rem',
+          alignItems: 'start',
+        }}
+          className="builder-grid"
+        >
+          {/* Left: metadata accordion + canvas */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <QuizMetadataPanel />
             <QuestionCanvas />
           </div>
-          
-          <div className="w-full xl:w-[360px] shrink-0">
-            <QuestionSettingsSidebar />
-          </div>
+
+          {/* Right: sticky control tower */}
+          <QuestionSettingsSidebar />
         </div>
-      </main>
+      </div>
+
+      <style>{`
+        @media (max-width: 1024px) {
+          .builder-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

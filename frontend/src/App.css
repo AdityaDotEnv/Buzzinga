@@ -340,10 +340,19 @@
   padding-top: 10px;
 }
 
-main {
+/* Homepage main only — AI page and others override via inline Tailwind flex */
+.app-shell > main {
   display: grid;
   gap: 88px;
   padding: 30px 0 0;
+}
+
+/* AI Studio page main — flex-col vertical stack */
+.app-shell.ai-page > main {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
 }
 
 .hero-section {
@@ -413,6 +422,11 @@ h1 {
   font-size: clamp(3rem, 6vw, 5.8rem);
   line-height: 0.95;
   letter-spacing: -0.06em;
+  /* max-width removed — was scoped to homepage hero only, broke other pages */
+}
+
+/* Homepage hero h1 only */
+.hero-copy h1 {
   max-width: 11ch;
 }
 
