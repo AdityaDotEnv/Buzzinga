@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
-import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import '../../App.css'
 import { Navbar } from '../../components/layout/Navbar'
 import { Footer } from '../../components/layout/Footer'
@@ -16,11 +17,10 @@ const AVATAR_COLORS: Record<string, string> = {
 };
 
 /* ── Starfield Particle ── */
-function Star({ mouseX, mouseY }: { mouseX: any; mouseY: any }) {
+function Star() {
   const x = useMemo(() => Math.random() * 100 + '%', []);
   const y = useMemo(() => Math.random() * 100 + '%', []);
   const size = useMemo(() => Math.random() * 2 + 1, []);
-  const duration = useMemo(() => Math.random() * 3 + 2, []);
 
   return (
     <motion.div
@@ -35,7 +35,11 @@ function Star({ mouseX, mouseY }: { mouseX: any; mouseY: any }) {
   );
 }
 
+/** Demo PIN — replace with real socket room lookup before production */
+const DEMO_GAME_PIN = '123456'
+
 export function JoinQuizPage() {
+  const navigate = useNavigate()
   const [gamePin, setGamePin] = useState('')
   const [nickname, setNickname] = useState('')
   const [selectedAvatar, setSelectedAvatar] = useState('🦊')
@@ -52,7 +56,7 @@ export function JoinQuizPage() {
     if (!gamePin) { setJoinStatus('error'); return; }
     setJoinStatus('joining');
     await new Promise(r => setTimeout(r, 1500));
-    if (gamePin === '123456') {
+    if (gamePin === DEMO_GAME_PIN) {
       setJoinStatus('success');
       setShowToast(true);
       setTimeout(() => setIsCountingDown(true), 4000);
@@ -67,7 +71,7 @@ export function JoinQuizPage() {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
       return () => clearTimeout(timer)
     } else if (isCountingDown && countdown === 0) {
-      window.location.href = '/live'
+      navigate('/live')
     }
   }, [isCountingDown, countdown])
 
@@ -100,7 +104,7 @@ export function JoinQuizPage() {
       {/* 2. Starfield Layer */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', opacity: isCountingDown ? 0.8 : 0.4 }}>
         {Array.from({ length: 50 }).map((_, i) => (
-          <Star key={i} mouseX={null} mouseY={null} />
+          <Star key={i} />
         ))}
       </div>
 

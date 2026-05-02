@@ -1,5 +1,3 @@
-import React from 'react'
-
 interface JoinStateFeedbackProps {
   status: 'idle' | 'joining' | 'error'
 }

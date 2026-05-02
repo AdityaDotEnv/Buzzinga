@@ -4,6 +4,7 @@ import { CreateQuizPage } from './pages/create-quiz/CreateQuizPage'
 import { JoinQuizPage } from './pages/join-quiz/JoinQuizPage'
 import { ManualQuizBuilderPage } from './pages/create-manual/ManualQuizBuilderPage'
 import { AIQuizGeneratorPage } from './pages/create-ai/AIQuizGeneratorPage'
+import { RoomCodePage } from './pages/play/RoomCodePage'
 
 export default function App() {
   return (
@@ -13,6 +14,8 @@ export default function App() {
       <Route path="/create/manual" element={<ManualQuizBuilderPage />} />
       <Route path="/create/ai" element={<AIQuizGeneratorPage />} />
       <Route path="/join" element={<JoinQuizPage />} />
+      <Route path="/play/:roomCode" element={<RoomCodePage />} />
+      <Route path="/live" element={<RoomCodePage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
