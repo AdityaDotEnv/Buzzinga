@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { Hash, Zap, Heart, MessageSquare, Trophy } from 'lucide-react'
 import { NicknameInput } from './NicknameInput'

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Trophy, Shuffle, PlayCircle, Rocket } from 'lucide-react';
 import { LaunchModal } from '../shared/LaunchModal';
