@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Flag, Volume2, VolumeX, Flame } from 'lucide-react'
+import { Flag, Volume2, VolumeX, Flame, X } from 'lucide-react'
 import { EmojiBurst, HypeBar } from './components/EmojiBurst'
 import { AnswerBarChart, ArchitectMascot } from './components/HostSuspense'
 import { Timer } from '../../components/gameplay/Timer'
 import { QuestionCard } from '../../components/gameplay/QuestionCard'
 import { AnswerGrid, SHAPE_CONFIG } from '../../components/gameplay/AnswerGrid'
 import { AnswerFeedback } from '../../components/gameplay/AnswerFeedback'
+import { ExitModal } from '../../components/gameplay/ExitModal'
 
 /* ── Types ── */
 type Phase = 'blastoff' | 'question' | 'locked' | 'timesup' | 'result'
@@ -88,6 +90,7 @@ function BlastOffOverlay({ onDone }: { onDone: () => void }) {
 /* ══════════════════════ MAIN PAGE ══════════════════════ */
 export function RoomCodePage() {
   const roomCode = 'LIVE01'
+  const navigate = useNavigate()
   const [phase, setPhase] = useState<Phase>('blastoff')
   const [qIndex, setQIndex] = useState(0)
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS)
@@ -97,6 +100,7 @@ export function RoomCodePage() {
   const [sound, setSound] = useState(true)
   const [answered, setAnswered] = useState(0) // mock host bar
   const [answerTime, setAnswerTime] = useState(0)
+  const [isExitOpen, setIsExitOpen] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const startTimeRef = useRef(Date.now())
 
@@ -153,18 +157,23 @@ export function RoomCodePage() {
       setQIndex(i => i + 1); setSelected(null); setPhase('question')
       setTimeLeft(TIMER_SECONDS); startTimeRef.current = Date.now()
     } else {
-      setQIndex(0); setSelected(null); setStreak(0); setScore(0); setPhase('blastoff')
+      // Quiz ended, do nothing or show final summary
+      // do not restart loop
     }
   }, [qIndex])
 
   /* Auto-advance from result phase */
   useEffect(() => {
     if (phase !== 'result') return
+    if (qIndex >= TOTAL_Q - 1) return // Stop at the last question's result
     const autoAdvance = setTimeout(() => {
       handleNext()
     }, 5000)
     return () => clearTimeout(autoAdvance)
-  }, [phase, handleNext])
+  }, [phase, handleNext, qIndex])
+
+  const handleExit = () => setIsExitOpen(true)
+  const confirmExit = () => navigate('/')
 
   const progressPct = (qIndex / TOTAL_Q) * 100
 
@@ -212,10 +221,10 @@ export function RoomCodePage() {
                 borderRadius: '0.7rem', padding: '0.45rem', cursor: 'pointer', color: '#f8fafc', display: 'flex' }}>
               {sound ? <Volume2 size={15} /> : <VolumeX size={15} />}
             </button>
-            <button title="Report question"
-              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '0.7rem', padding: '0.45rem', cursor: 'pointer', color: '#fb7185', display: 'flex' }}>
-              <Flag size={15} />
+            <button onClick={handleExit} title="Exit quiz"
+              style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+                borderRadius: '0.7rem', padding: '0.45rem', cursor: 'pointer', color: '#ef4444', display: 'flex' }}>
+              <X size={15} />
             </button>
           </div>
         </div>
@@ -311,7 +320,7 @@ export function RoomCodePage() {
         )}
       </AnimatePresence>
 
-      {/* ── Streak Counter ── */}
+      {/* Streak Counter */}
       {streak > 0 && (phase === 'question' || phase === 'locked') && (
         <motion.div key={streak} initial={{ scale: 0.55, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           style={{ position: 'fixed', bottom: '1.25rem', left: '50%', transform: 'translateX(-50%)', zIndex: 60,
@@ -325,6 +334,13 @@ export function RoomCodePage() {
           {streak >= 3 ? `${streak}x FIRE STREAK! 🔥` : `${streak}x Streak`}
         </motion.div>
       )}
+
+      {/* Exit Modal */}
+      <ExitModal 
+        isOpen={isExitOpen} 
+        onClose={() => setIsExitOpen(false)} 
+        onConfirm={confirmExit} 
+      />
     </div>
   )
 }
