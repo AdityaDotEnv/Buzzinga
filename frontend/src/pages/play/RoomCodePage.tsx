@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Flag, Volume2, VolumeX, Flame } from 'lucide-react'
+import { Flag, Volume2, VolumeX, Flame, X } from 'lucide-react'
 import { EmojiBurst, HypeBar } from './components/EmojiBurst'
-import { LockedInCard } from './components/LockedInCard'
 import { AnswerBarChart, ArchitectMascot } from './components/HostSuspense'
-import { MomentumScreen } from './components/MomentumScreen'
+import { Timer } from '../../components/gameplay/Timer'
+import { QuestionCard } from '../../components/gameplay/QuestionCard'
+import { AnswerGrid, SHAPE_CONFIG } from '../../components/gameplay/AnswerGrid'
+import { AnswerFeedback } from '../../components/gameplay/AnswerFeedback'
+import { ExitModal } from '../../components/gameplay/ExitModal'
 
 /* ── Types ── */
 type Phase = 'blastoff' | 'question' | 'locked' | 'timesup' | 'result'
@@ -26,53 +30,6 @@ const TOTAL_Q = QUESTIONS.length
 const TIMER_SECONDS = 20
 const MOCK_PLAYERS = 8
 
-const SHAPE_CONFIG = [
-  { color: '#e11d48', glow: 'rgba(225,29,72,0.45)', label: '▲' },
-  { color: '#2563eb', glow: 'rgba(37,99,235,0.45)',  label: '◆' },
-  { color: '#f59e0b', glow: 'rgba(245,158,11,0.45)', label: '●' },
-  { color: '#16a34a', glow: 'rgba(22,163,74,0.45)',  label: '■' },
-]
-
-/* ── Circular SVG Timer ── */
-function CircularTimer({ remaining, total }: { remaining: number; total: number }) {
-  const R = 52; const C = 2 * Math.PI * R
-  const progress = Math.max(0, remaining) / total
-  const dash = progress * C
-  const isLow = remaining <= 3
-  const hue = Math.round(progress * 180)
-  const color = `hsl(${hue},100%,55%)`
-  return (
-    <div style={{ position: 'relative', width: 120, height: 120 }}>
-      <motion.div
-        animate={isLow ? { scale: [1, 1.07, 1] } : { scale: 1 }}
-        transition={isLow ? { repeat: Infinity, duration: 0.55 } : {}}
-        style={{ position: 'absolute', inset: 0 }}
-      >
-        <svg width="120" height="120" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="9" />
-          <motion.circle cx="60" cy="60" r={R} fill="none" stroke={color} strokeWidth="9" strokeLinecap="round"
-            strokeDasharray={`${dash} ${C}`} strokeDashoffset={C * 0.25}
-            animate={{ strokeDasharray: `${dash} ${C}`, stroke: color }}
-            transition={{ duration: 0.5, ease: 'linear' }}
-            style={{ filter: `drop-shadow(0 0 7px ${color})` }}
-          />
-        </svg>
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <motion.span key={remaining} initial={{ scale: 1.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-            style={{ fontSize: '1.8rem', fontWeight: 900, color: isLow ? '#f43f5e' : '#f8fafc', lineHeight: 1 }}>
-            {Math.max(0, remaining)}
-          </motion.span>
-          <span style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>sec</span>
-        </div>
-      </motion.div>
-      {isLow && (
-        <motion.div animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.14, 1] }}
-          transition={{ repeat: Infinity, duration: 0.5 }}
-          style={{ position: 'absolute', inset: -7, borderRadius: '50%', border: '2px solid #f43f5e', filter: 'blur(2px)', pointerEvents: 'none' }} />
-      )}
-    </div>
-  )
-}
 
 /* ── Fire Edge ── */
 function FireEdge() {
@@ -133,6 +90,7 @@ function BlastOffOverlay({ onDone }: { onDone: () => void }) {
 /* ══════════════════════ MAIN PAGE ══════════════════════ */
 export function RoomCodePage() {
   const roomCode = 'LIVE01'
+  const navigate = useNavigate()
   const [phase, setPhase] = useState<Phase>('blastoff')
   const [qIndex, setQIndex] = useState(0)
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS)
@@ -142,6 +100,7 @@ export function RoomCodePage() {
   const [sound, setSound] = useState(true)
   const [answered, setAnswered] = useState(0) // mock host bar
   const [answerTime, setAnswerTime] = useState(0)
+  const [isExitOpen, setIsExitOpen] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const startTimeRef = useRef(Date.now())
 
@@ -156,7 +115,7 @@ export function RoomCodePage() {
 
   /* Timer tick */
   useEffect(() => {
-    if (phase !== 'question') return
+    if (phase !== 'question' && phase !== 'locked') return
     if (timeLeft <= 0) { goTimesUp(); return }
     timerRef.current = setTimeout(() => setTimeLeft(t => t - 1), 1000)
     return clearTimer
@@ -174,7 +133,7 @@ export function RoomCodePage() {
 
   /* Soundscape hook — placeholder: would drive Web Audio API pitch/tempo */
   useEffect(() => {
-    if (!sound || phase !== 'question') return
+    if (!sound || (phase !== 'question' && phase !== 'locked')) return
     // SOUND_HOOK: tension_music.setTempo(1 + (1 - timeLeft / TIMER_SECONDS) * 0.6)
     // SOUND_HOOK: tension_music.setPitch(1 + (1 - timeLeft / TIMER_SECONDS) * 0.4)
   }, [timeLeft, sound, phase])
@@ -183,7 +142,6 @@ export function RoomCodePage() {
 
   const handleAnswer = (idx: number) => {
     if (phase !== 'question') return
-    clearTimer()
     const taken = Math.round((Date.now() - startTimeRef.current) / 1000)
     setAnswerTime(taken)
     setSelected(idx)
@@ -194,14 +152,28 @@ export function RoomCodePage() {
     else setStreak(0)
   }
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (qIndex < TOTAL_Q - 1) {
       setQIndex(i => i + 1); setSelected(null); setPhase('question')
       setTimeLeft(TIMER_SECONDS); startTimeRef.current = Date.now()
     } else {
-      setQIndex(0); setSelected(null); setStreak(0); setScore(0); setPhase('blastoff')
+      // Quiz ended, do nothing or show final summary
+      // do not restart loop
     }
-  }
+  }, [qIndex])
+
+  /* Auto-advance from result phase */
+  useEffect(() => {
+    if (phase !== 'result') return
+    if (qIndex >= TOTAL_Q - 1) return // Stop at the last question's result
+    const autoAdvance = setTimeout(() => {
+      handleNext()
+    }, 5000)
+    return () => clearTimeout(autoAdvance)
+  }, [phase, handleNext, qIndex])
+
+  const handleExit = () => setIsExitOpen(true)
+  const confirmExit = () => navigate('/')
 
   const progressPct = (qIndex / TOTAL_Q) * 100
 
@@ -249,10 +221,10 @@ export function RoomCodePage() {
                 borderRadius: '0.7rem', padding: '0.45rem', cursor: 'pointer', color: '#f8fafc', display: 'flex' }}>
               {sound ? <Volume2 size={15} /> : <VolumeX size={15} />}
             </button>
-            <button title="Report question"
-              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '0.7rem', padding: '0.45rem', cursor: 'pointer', color: '#fb7185', display: 'flex' }}>
-              <Flag size={15} />
+            <button onClick={handleExit} title="Exit quiz"
+              style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+                borderRadius: '0.7rem', padding: '0.45rem', cursor: 'pointer', color: '#ef4444', display: 'flex' }}>
+              <X size={15} />
             </button>
           </div>
         </div>
@@ -271,7 +243,7 @@ export function RoomCodePage() {
             {/* Timer row */}
             <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
-                <CircularTimer remaining={phase === 'locked' || phase === 'result' ? 0 : timeLeft} total={TIMER_SECONDS} />
+                <Timer remaining={phase === 'result' ? 0 : timeLeft} total={TIMER_SECONDS} />
               </div>
 
               {/* Mascot in center (host drama) */}
@@ -295,65 +267,32 @@ export function RoomCodePage() {
             )}
 
             {/* Question card */}
-            <motion.div layoutId="qcard"
-              style={{ width: '100%', padding: '1.6rem 1.75rem', borderRadius: '1.5rem',
-                background: 'rgba(13,18,38,0.8)', backdropFilter: 'blur(28px)',
-                border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 24px 80px rgba(0,0,0,0.45)',
-                textAlign: 'center' }}>
-              <p style={{ fontSize: 'clamp(1.15rem,3vw,1.65rem)', fontWeight: 700, lineHeight: 1.45, color: '#f1f5f9', margin: 0 }}>
-                {q.text}
-              </p>
-            </motion.div>
+            <QuestionCard question={q.text} />
 
             {/* Answer Grid */}
             {phase !== 'result' && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.7rem', width: '100%' }}>
-                {q.options.map((opt, idx) => {
-                  const cfg = SHAPE_CONFIG[idx]
-                  const isSelected = selected === idx
-                  const dimmed = phase === 'locked' && !isSelected
-                  return (
-                    <motion.button key={idx} id={`answer-${idx}`}
-                      onClick={() => handleAnswer(idx)}
-                      disabled={phase === 'locked'}
-                      whileHover={phase === 'question' ? { scale: 1.03, y: -3 } : {}}
-                      whileTap={phase === 'question' ? { scale: 0.95, rotate: -1 } : {}}
-                      animate={isSelected ? { scale: [1, 1.05, 1] } : { scale: 1 }}
-                      transition={isSelected ? { repeat: Infinity, duration: 1.15 } : {}}
-                      style={{
-                        minHeight: 76, borderRadius: '1.2rem',
-                        background: `linear-gradient(135deg,${cfg.color}20,${cfg.color}42)`,
-                        border: `2px solid ${isSelected ? cfg.color : dimmed ? 'rgba(255,255,255,0.04)' : `${cfg.color}60`}`,
-                        boxShadow: isSelected ? `0 0 30px ${cfg.glow},inset 0 1px 0 rgba(255,255,255,0.12)` : 'none',
-                        color: '#f8fafc', cursor: phase === 'question' ? 'pointer' : 'default',
-                        opacity: dimmed ? 0.28 : 1,
-                        transition: 'opacity 280ms,border-color 280ms,box-shadow 280ms',
-                        display: 'flex', alignItems: 'center', gap: '0.7rem',
-                        padding: '1rem 1.2rem', textAlign: 'left',
-                        fontSize: 'clamp(0.88rem,2.5vw,1rem)', fontWeight: 600,
-                      }}>
-                      <span style={{ fontSize: '1.4rem', minWidth: '1.8rem', textAlign: 'center',
-                        filter: isSelected ? `drop-shadow(0 0 8px ${cfg.color})` : 'none' }}>
-                        {cfg.label}
-                      </span>
-                      <span>{opt}</span>
-                    </motion.button>
-                  )
-                })}
-              </div>
+              <AnswerGrid 
+                options={q.options} 
+                selected={selected} 
+                phase={phase} 
+                onAnswer={handleAnswer} 
+              />
             )}
 
-            {/* Locked-in card */}
-            <AnimatePresence>
-              {phase === 'locked' && selected !== null && (
-                <LockedInCard
-                  selectedColor={SHAPE_CONFIG[selected].color}
-                  selectedGlow={SHAPE_CONFIG[selected].glow}
-                  answerTime={answerTime}
-                  totalTime={TIMER_SECONDS}
-                />
-              )}
-            </AnimatePresence>
+            {/* Feedback & Result Screen */}
+            <AnswerFeedback 
+              phase={phase}
+              selected={selected}
+              selectedColor={selected !== null ? SHAPE_CONFIG[selected].color : undefined}
+              selectedGlow={selected !== null ? SHAPE_CONFIG[selected].glow : undefined}
+              answerTime={answerTime}
+              totalTime={TIMER_SECONDS}
+              questionCorrect={selected === q.correct}
+              playerScore={score}
+              playerStreak={streak}
+              onNext={handleNext}
+              isLastQuestion={qIndex === TOTAL_Q - 1}
+            />
 
             {/* Hype bar — always visible when active */}
             {(phase === 'question' || phase === 'locked') && (
@@ -361,19 +300,6 @@ export function RoomCodePage() {
                 <HypeBar />
               </motion.div>
             )}
-
-            {/* Momentum result screen */}
-            <AnimatePresence>
-              {phase === 'result' && (
-                <MomentumScreen
-                  questionCorrect={selected === q.correct}
-                  playerScore={score}
-                  playerStreak={streak}
-                  onNext={handleNext}
-                  isLastQuestion={qIndex === TOTAL_Q - 1}
-                />
-              )}
-            </AnimatePresence>
           </motion.main>
         )}
       </AnimatePresence>
@@ -394,7 +320,7 @@ export function RoomCodePage() {
         )}
       </AnimatePresence>
 
-      {/* ── Streak Counter ── */}
+      {/* Streak Counter */}
       {streak > 0 && (phase === 'question' || phase === 'locked') && (
         <motion.div key={streak} initial={{ scale: 0.55, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           style={{ position: 'fixed', bottom: '1.25rem', left: '50%', transform: 'translateX(-50%)', zIndex: 60,
@@ -408,6 +334,13 @@ export function RoomCodePage() {
           {streak >= 3 ? `${streak}x FIRE STREAK! 🔥` : `${streak}x Streak`}
         </motion.div>
       )}
+
+      {/* Exit Modal */}
+      <ExitModal 
+        isOpen={isExitOpen} 
+        onClose={() => setIsExitOpen(false)} 
+        onConfirm={confirmExit} 
+      />
     </div>
   )
 }
