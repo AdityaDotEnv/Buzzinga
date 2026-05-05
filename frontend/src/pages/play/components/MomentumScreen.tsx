@@ -40,8 +40,8 @@ export function MomentumScreen({ questionCorrect, playerScore, playerStreak, onN
       exit={{ opacity: 0, y: -30 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       style={{
-        width: '100%', display: 'flex', flexDirection: 'column', gap: '1.25rem',
-        padding: '1.5rem', borderRadius: '1.75rem',
+        width: '100%', display: 'flex', flexDirection: 'column', gap: '0.85rem',
+        padding: '1.25rem', borderRadius: '1.75rem',
         background: 'rgba(10,14,30,0.92)', border: '1px solid rgba(255,255,255,0.1)',
         boxShadow: '0 32px 80px rgba(0,0,0,0.5)',
       }}
