@@ -111,7 +111,7 @@ export function RoomCodePage() {
 
   /* Timer tick */
   useEffect(() => {
-    if (phase !== 'question') return
+    if (phase !== 'question' && phase !== 'locked') return
     if (timeLeft <= 0) { goTimesUp(); return }
     timerRef.current = setTimeout(() => setTimeLeft(t => t - 1), 1000)
     return clearTimer
@@ -129,7 +129,7 @@ export function RoomCodePage() {
 
   /* Soundscape hook — placeholder: would drive Web Audio API pitch/tempo */
   useEffect(() => {
-    if (!sound || phase !== 'question') return
+    if (!sound || (phase !== 'question' && phase !== 'locked')) return
     // SOUND_HOOK: tension_music.setTempo(1 + (1 - timeLeft / TIMER_SECONDS) * 0.6)
     // SOUND_HOOK: tension_music.setPitch(1 + (1 - timeLeft / TIMER_SECONDS) * 0.4)
   }, [timeLeft, sound, phase])
@@ -138,7 +138,6 @@ export function RoomCodePage() {
 
   const handleAnswer = (idx: number) => {
     if (phase !== 'question') return
-    clearTimer()
     const taken = Math.round((Date.now() - startTimeRef.current) / 1000)
     setAnswerTime(taken)
     setSelected(idx)
@@ -235,7 +234,7 @@ export function RoomCodePage() {
             {/* Timer row */}
             <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
-                <Timer remaining={phase === 'locked' || phase === 'result' ? 0 : timeLeft} total={TIMER_SECONDS} />
+                <Timer remaining={phase === 'result' ? 0 : timeLeft} total={TIMER_SECONDS} />
               </div>
 
               {/* Mascot in center (host drama) */}
