@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Room from '../models/roomModel';
+import Quiz from '../models/quizModel';
 
 const generateRoomCode = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -12,14 +13,29 @@ export const createRoom = async (req: Request, res: Response) => {
       exists = await Room.findOne({ roomCode });
     }
 
-    const hostId = req.body.hostId || 'host-' + Math.random().toString(36).substring(7);
+    const { quizId, hostSecret } = req.body;
+
+    if (!quizId || !hostSecret) {
+      return res.status(400).json({ message: 'quizId and hostSecret are required' });
+    }
+
+    // Verify quiz ownership/secret
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) {
+      return res.status(404).json({ message: 'Quiz not found' });
+    }
+
+    if (quiz.hostSecret !== hostSecret) {
+      return res.status(403).json({ message: 'Invalid host secret' });
+    }
 
     const room = await Room.create({
       roomCode,
-      hostId,
+      quizId,
+      hostSecret,
     });
 
-    res.status(201).json({ roomCode: room.roomCode, status: room.status });
+    res.status(201).json({ roomCode: room.roomCode, status: room.status, quizId: room.quizId });
   } catch (error) {
     res.status(500).json({ message: 'Error creating room' });
   }

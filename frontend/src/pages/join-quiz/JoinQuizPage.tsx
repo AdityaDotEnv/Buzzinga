@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { setAuth } from '../../store/authSlice'
 import { motion, AnimatePresence } from 'framer-motion'
 import '../../App.css'
 import { Navbar } from '../../components/layout/Navbar'
@@ -8,6 +10,7 @@ import { JoinHero } from '../../components/join/JoinHero'
 import { GamePinCard } from '../../components/join/GamePinCard'
 import { RoomPreviewCard } from '../../components/join/RoomPreviewCard'
 import { SuccessToast } from '../../components/join/SuccessToast'
+import { roomApi } from '../../services/api'
 
 type JoinStatus = 'idle' | 'joining' | 'error' | 'success'
 
@@ -35,11 +38,9 @@ function Star() {
   );
 }
 
-/** Demo PIN — replace with real socket room lookup before production */
-const DEMO_GAME_PIN = '123456'
-
 export function JoinQuizPage() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [gamePin, setGamePin] = useState('')
   const [nickname, setNickname] = useState('')
   const [selectedAvatar, setSelectedAvatar] = useState('🦊')
@@ -53,14 +54,20 @@ export function JoinQuizPage() {
   const avatarColor = AVATAR_COLORS[selectedAvatar] || '#ec4899';
 
   const handleJoin = async () => {
-    if (!gamePin) { setJoinStatus('error'); return; }
+    if (!gamePin || !nickname) { setJoinStatus('error'); return; }
     setJoinStatus('joining');
-    await new Promise(r => setTimeout(r, 1500));
-    if (gamePin === DEMO_GAME_PIN) {
-      setJoinStatus('success');
-      setShowToast(true);
-      setTimeout(() => setIsCountingDown(true), 4000);
-    } else {
+    
+    try {
+      const res = await roomApi.join(gamePin, nickname);
+      if (res.message === 'Joined successfully') {
+        dispatch(setAuth({ hostSecret: '', role: 'player' }));
+        setJoinStatus('success');
+        setShowToast(true);
+        setTimeout(() => setIsCountingDown(true), 1500);
+      } else {
+        throw new Error(res.message);
+      }
+    } catch (err) {
       setJoinStatus('error');
       setTimeout(() => setJoinStatus('idle'), 2000);
     }
@@ -73,7 +80,7 @@ export function JoinQuizPage() {
     } else if (isCountingDown && countdown === 0) {
       navigate('/live')
     }
-  }, [isCountingDown, countdown])
+  }, [isCountingDown, countdown, navigate])
 
   return (
     <div style={{
@@ -81,7 +88,6 @@ export function JoinQuizPage() {
       color: '#f8fafc', position: 'relative', overflowX: 'hidden', background: '#0a0a1a'
     }}>
       
-      {/* 1. Aurora Motion Background */}
       <motion.div
         animate={{
           background: isCountingDown 
@@ -101,14 +107,12 @@ export function JoinQuizPage() {
         style={{ position: 'fixed', inset: 0, zIndex: -1 }}
       />
 
-      {/* 2. Starfield Layer */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', opacity: isCountingDown ? 0.8 : 0.4 }}>
         {Array.from({ length: 50 }).map((_, i) => (
           <Star key={i} />
         ))}
       </div>
 
-      {/* Hyperdrive Effect Overlay */}
       <AnimatePresence>
         {isCountingDown && (
           <motion.div
@@ -155,7 +159,6 @@ export function JoinQuizPage() {
             onNicknameChange={(v) => setNickname(v)} 
             onJoin={handleJoin} 
             status={joinStatus === 'success' ? 'idle' : joinStatus} 
-            /* Pass avatar selection to parent */
             onAvatarChange={setSelectedAvatar}
           />
         </motion.div>

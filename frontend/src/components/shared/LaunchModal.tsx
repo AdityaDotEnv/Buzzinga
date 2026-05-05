@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Share2, Users, Play, Check, Zap, Clock, FlaskConical, Binary, BookOpen, Music, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setAuth } from '../../store/authSlice';
+import { roomApi, quizApi } from '../../services/api';
 
 /* ── Icons mapping for Topic ── */
 const TOPIC_ICONS: Record<string, any> = {
@@ -15,7 +18,6 @@ const TOPIC_ICONS: Record<string, any> = {
 };
 
 /* ── Mock avatars ── */
-const MOCK_NAMES = ['Riya', 'Aditya', 'Sam', 'Priya', 'Max', 'Zara', 'Leo', 'Nina'];
 const AVATAR_COLORS = ['#ec4899','#f97316','#67e8f9','#a78bfa','#fbbf24','#34d399','#f472b6','#38bdf8'];
 
 function PinDigit({ digit, index }: { digit: string; index: number }) {
@@ -51,13 +53,69 @@ interface LaunchModalProps {
 
 export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic }: LaunchModalProps) {
   const navigate = useNavigate();
-  const [pin] = useState(() => String(Math.floor(100000 + Math.random() * 900000)));
+  const dispatch = useDispatch();
+  const [pin, setPin] = useState('------');
+  const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [wink, setWink] = useState(false);
   const [maxPlayers, setMaxPlayers] = useState(30);
   const [hostPaced, setHostPaced] = useState(true);
   const [players, setPlayers] = useState<{ name: string; color: string }[]>([]);
   const [ding, setDing] = useState(false);
+
+  // Fetch real room code from backend
+  useEffect(() => {
+    async function initRoom() {
+      try {
+        // 1. Create a mock quiz first if no ID (for demo purposes)
+        const quiz = await quizApi.create({
+          title: quizTitle || 'New Quiz',
+          questions: [
+            { text: 'Sample Question?', options: ['A', 'B', 'C', 'D'], correct: 0 }
+          ],
+          creatorId: 'host-123'
+        });
+
+        // Store hostSecret in Redux/localStorage
+        if (quiz.hostSecret) {
+          dispatch(setAuth({ hostSecret: quiz.hostSecret, role: 'host' }));
+        }
+
+        // 2. Create the room linked to this quiz
+        const room = await roomApi.create(quiz._id, quiz.hostSecret);
+        setPin(room.roomCode);
+      } catch (err) {
+        console.error('Failed to create room:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    initRoom();
+  }, [quizTitle, dispatch]);
+
+  // Polling for players
+  useEffect(() => {
+    if (pin === '------') return;
+    
+    const fetchPlayers = async () => {
+      try {
+        const room = await roomApi.get(pin);
+        if (room && room.players) {
+          const updatedPlayers = room.players.map((p: any, idx: number) => ({
+            name: p.nickname,
+            color: AVATAR_COLORS[idx % AVATAR_COLORS.length]
+          }));
+          setPlayers(updatedPlayers);
+        }
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+    };
+
+    const interval = setInterval(fetchPlayers, 2000);
+    fetchPlayers();
+    return () => clearInterval(interval);
+  }, [pin]);
 
   const TopicIcon = (topic && TOPIC_ICONS[Object.keys(TOPIC_ICONS).find(k => topic.includes(k)) || 'Default']) || Zap;
 
@@ -66,19 +124,8 @@ export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic }:
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    let i = 0;
-    const addPlayer = () => {
-      if (i >= MOCK_NAMES.length) return;
-      setPlayers(p => [...p, { name: MOCK_NAMES[i], color: AVATAR_COLORS[i % AVATAR_COLORS.length] }]);
-      i++;
-      setTimeout(addPlayer, 1200 + Math.random() * 800);
-    };
-    const t = setTimeout(addPlayer, 1500);
-    return () => clearTimeout(t);
-  }, []);
-
   const copyPin = useCallback(() => {
+    if (pin === '------') return;
     navigator.clipboard.writeText(pin).catch(() => {});
     setCopied(true);
     setWink(true);
@@ -185,13 +232,15 @@ export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic }:
                 <TopicIcon size={24} />
               </motion.div>
 
-              <button onClick={copyPin} style={{
+              <button onClick={copyPin} disabled={loading} style={{
                 ...BTN,
                 background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.07)',
                 border: `1px solid ${copied ? 'rgba(16,185,129,0.35)' : 'rgba(255,255,255,0.1)'}`,
                 color: copied ? '#34d399' : '#e2e8f0',
+                opacity: loading ? 0.5 : 1,
+                cursor: loading ? 'not-allowed' : 'pointer'
               }}>
-                {copied ? <><Check size={15} /> Copied!</> : <><Copy size={15} /> Copy PIN</>}
+                {loading ? 'Generating...' : copied ? <><Check size={15} /> Copied!</> : <><Copy size={15} /> Copy PIN</>}
               </button>
 
               <button style={{ ...BTN, background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.25)', color: '#fb923c' }}>
@@ -239,8 +288,8 @@ export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic }:
             </div>
           </div>
 
-          <motion.button whileHover={{ scale: 1.02, boxShadow: '0 0 32px rgba(16,185,129,0.5)' }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/live')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.55rem', width: '100%', padding: '1.05rem', background: 'linear-gradient(135deg, #10b981, #06b6d4)', border: 'none', borderRadius: '1rem', color: '#022c22', fontSize: '1rem', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 0 20px rgba(16,185,129,0.35)' }}>
-            <Zap size={19} fill="currentColor" /> Start Quiz Now
+          <motion.button whileHover={{ scale: 1.02, boxShadow: '0 0 32px rgba(16,185,129,0.5)' }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/live')} disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.55rem', width: '100%', padding: '1.05rem', background: 'linear-gradient(135deg, #10b981, #06b6d4)', border: 'none', borderRadius: '1rem', color: '#022c22', fontSize: '1rem', fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', boxShadow: '0 0 20px rgba(16,185,129,0.35)', opacity: loading ? 0.7 : 1 }}>
+            <Zap size={19} fill="currentColor" /> {loading ? 'Initializing...' : 'Start Quiz Now'}
           </motion.button>
         </div>
       </motion.div>

@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import healthRoutes from './routes/healthRoutes';
 import roomRoutes from './routes/roomRoutes';
+import quizRoutes from './routes/quizRoutes';
 import { notFound, errorHandler } from './middleware/errorMiddleware';
 
 const app: Application = express();
@@ -19,6 +20,8 @@ app.use('/api/health', healthRoutes);
 app.use('/api/v1/health', healthRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/v1/rooms', roomRoutes);
+app.use('/api/quizzes', quizRoutes);
+app.use('/api/v1/quizzes', quizRoutes);
 
 // Error Handling
 app.use(notFound);
