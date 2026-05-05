@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import healthRoutes from './routes/healthRoutes';
+import roomRoutes from './routes/roomRoutes';
 import { notFound, errorHandler } from './middleware/errorMiddleware';
 
 const app: Application = express();
@@ -16,6 +17,8 @@ app.use(express.json());
 // Routes
 app.use('/api/health', healthRoutes);
 app.use('/api/v1/health', healthRoutes);
+app.use('/api/rooms', roomRoutes);
+app.use('/api/v1/rooms', roomRoutes);
 
 // Error Handling
 app.use(notFound);
