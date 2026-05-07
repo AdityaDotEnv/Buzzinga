@@ -1,7 +1,23 @@
 import { motion } from 'framer-motion'
 import { Users, Clock, Trophy } from 'lucide-react'
 
-export function RoomPreviewCard() {
+interface RoomPreviewCardProps {
+  title?: string;
+  host?: string;
+  players?: number;
+  maxPlayers?: number;
+  questions?: number;
+  status?: string;
+}
+
+export function RoomPreviewCard({ 
+  title = "Science Trivia Night", 
+  host = "Dr. Quizzo", 
+  players = 12, 
+  maxPlayers = 50, 
+  questions = 20, 
+  status = "Waiting…" 
+}: RoomPreviewCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -21,6 +37,7 @@ export function RoomPreviewCard() {
         backdropFilter: 'blur(20px)',
         boxShadow: '0 16px 48px rgba(2,6,23,0.4)',
         cursor: 'default',
+        width: '100%'
       }}
     >
       {/* Tear-off stub — left dashed border */}
@@ -71,7 +88,7 @@ export function RoomPreviewCard() {
               }}
             />
             <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#34d399', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              Active
+              {status === 'Active' ? 'Active' : 'Waiting'}
             </span>
           </div>
         </div>
@@ -79,10 +96,10 @@ export function RoomPreviewCard() {
         {/* Quiz info */}
         <div>
           <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.01em' }}>
-            Science Trivia Night
+            {title}
           </h3>
           <p style={{ margin: '0.2rem 0 0', fontSize: '0.8rem', color: 'rgba(148,163,184,0.6)' }}>
-            Host: Dr. Quizzo
+            Host: {host}
           </p>
         </div>
 
@@ -95,7 +112,7 @@ export function RoomPreviewCard() {
             <Users size={13} style={{ color: '#67e8f9' }} />
             <div>
               <div style={{ fontSize: '0.65rem', color: 'rgba(148,163,184,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Players</div>
-              <div style={{ fontSize: '0.88rem', color: '#e2e8f0', fontWeight: 600 }}>12 / 50</div>
+              <div style={{ fontSize: '0.88rem', color: '#e2e8f0', fontWeight: 600 }}>{players} / {maxPlayers}</div>
             </div>
           </div>
 
@@ -103,7 +120,7 @@ export function RoomPreviewCard() {
             <Clock size={13} style={{ color: '#a78bfa' }} />
             <div>
               <div style={{ fontSize: '0.65rem', color: 'rgba(148,163,184,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Status</div>
-              <div style={{ fontSize: '0.88rem', color: '#e2e8f0', fontWeight: 600 }}>Waiting…</div>
+              <div style={{ fontSize: '0.88rem', color: '#e2e8f0', fontWeight: 600 }}>{status}</div>
             </div>
           </div>
 
@@ -111,11 +128,11 @@ export function RoomPreviewCard() {
             <Trophy size={13} style={{ color: '#fbbf24' }} />
             <div>
               <div style={{ fontSize: '0.65rem', color: 'rgba(148,163,184,0.5)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>Questions</div>
-              <div style={{ fontSize: '0.88rem', color: '#e2e8f0', fontWeight: 600 }}>20</div>
+              <div style={{ fontSize: '0.88rem', color: '#e2e8f0', fontWeight: 600 }}>{questions}</div>
             </div>
           </div>
         </div>
       </div>
     </motion.div>
-  )
+  );
 }
