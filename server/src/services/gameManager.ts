@@ -5,6 +5,7 @@ import Room from '../models/roomModel';
 interface GameState {
   roomCode: string;
   quizId: string;
+  quizTitle: string;
   questions: any[];
   currentQuestionIndex: number;
   phase: 'waiting' | 'countdown' | 'question' | 'locked' | 'result' | 'ended';
@@ -50,6 +51,7 @@ class GameManager {
       state = {
         roomCode,
         quizId: room.quizId.toString(),
+        quizTitle: (quiz as any).title || 'Untitled Quiz',
         questions: quiz.questions,
         currentQuestionIndex: 0,
         phase: 'waiting',
@@ -171,6 +173,7 @@ class GameManager {
     // Send full state to host, limited state to players (no correct answers)
     const playerState = {
       roomCode: state.roomCode,
+      quizTitle: state.quizTitle,
       phase: state.phase,
       currentQuestionIndex: state.currentQuestionIndex,
       totalQuestions: state.questions.length,

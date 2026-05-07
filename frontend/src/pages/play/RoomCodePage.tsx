@@ -137,12 +137,12 @@ export function RoomCodePage() {
     )
   }
 
-  const { phase, timer, currentQuestionIndex, totalQuestions, players, question } = gameState
+  const { phase, timer, currentQuestionIndex, totalQuestions, players, question, quizTitle } = gameState
   const answeredCount = players?.filter((p: any) => p.answered).length || 0
   const isLastQuestion = currentQuestionIndex === totalQuestions - 1
 
   const handleAnswer = (idx: number) => {
-    if (phase !== 'question' || selected !== null || role === 'host') return
+    if (phase !== 'question' || selected !== null) return
     setSelected(idx)
     socket.emit('submit-answer', { roomCode, answerIndex: idx })
     
@@ -192,7 +192,7 @@ export function RoomCodePage() {
             <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#06b6d4' }}>{roomCode}</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Question</div>
+            <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{quizTitle || 'Quiz'}</div>
             <div style={{ fontWeight: 900, fontSize: '1rem' }}>{currentQuestionIndex + 1}<span style={{ color: 'rgba(255,255,255,0.28)' }}> / {totalQuestions}</span></div>
           </div>
           <div style={{ display: 'flex', gap: '0.45rem' }}>
@@ -212,6 +212,20 @@ export function RoomCodePage() {
 
       {/* ── Main Content ── */}
       <AnimatePresence mode="wait">
+        {(phase === 'waiting' || phase === 'countdown') && (
+          <motion.main key="lobby" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', gap: '1.5rem' }}>
+            <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }}
+              style={{ fontSize: '4rem' }}>⚡</motion.div>
+            <h2 style={{ fontSize: '2rem', fontWeight: 900, textAlign: 'center' }}>{quizTitle || 'Getting Ready...'}</h2>
+            <motion.div style={{ fontSize: '5rem', fontWeight: 900, color: '#ec4899', textShadow: '0 0 40px rgba(236,72,153,0.4)' }}>
+              {timer}s
+            </motion.div>
+            <p style={{ opacity: 0.6, textAlign: 'center' }}>Welcome, {nickname}! The quiz starts when the countdown hits zero.</p>
+            <div style={{ fontSize: '0.85rem', opacity: 0.5 }}>{players?.length || 0} player(s) in lobby</div>
+          </motion.main>
+        )}
+
         {(phase === 'question' || phase === 'locked' || phase === 'result') && (
           <motion.main key={`q-${currentQuestionIndex}`}
             initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -24 }}
@@ -272,8 +286,6 @@ export function RoomCodePage() {
               playerStreak={streak}
               onNext={() => {}}
               isLastQuestion={isLastQuestion}
-              isHostView={role === 'host'}
-              players={players}
             />
 
             {/* Hype bar — always visible when active */}
