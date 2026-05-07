@@ -13,6 +13,10 @@ export const quizApi = {
     const res = await fetch(`${API_BASE_URL}/quizzes/${id}`);
     return res.json();
   },
+  list: async () => {
+    const res = await fetch(`${API_BASE_URL}/quizzes`);
+    return res.json();
+  },
 };
 
 export const roomApi = {

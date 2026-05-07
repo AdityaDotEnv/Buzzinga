@@ -97,9 +97,21 @@ export function JoinQuizPage() {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
       return () => clearTimeout(timer);
     } else if (isCountingDown && countdown === 0) {
-      navigate("/live");
+      navigate("/play/" + gamePin, { state: { nickname } });
     }
   }, [isCountingDown, countdown, navigate]);
+
+  const [featuredQuizzes, setFeaturedQuizzes] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function getFeatured() {
+      try {
+        const data = await quizApi.list();
+        setFeaturedQuizzes(data.slice(0, 3));
+      } catch (err) {}
+    }
+    getFeatured();
+  }, []);
 
   return (
     <div
@@ -113,6 +125,7 @@ export function JoinQuizPage() {
         background: "#0a0a1a",
       }}
     >
+      {/* ... rest of the background motion code ... */}
       {/* 1. Aurora Motion Background */}
       <motion.div
         animate={{
@@ -293,9 +306,23 @@ export function JoinQuizPage() {
             hidden: { opacity: 0, y: 20 },
             show: { opacity: 1, y: 0 },
           }}
-          style={{ width: "100%", maxWidth: "500px" }}
+          style={{ width: "100%", maxWidth: "500px", display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
         >
-          <RoomPreviewCard />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 0.5rem' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Featured Rooms</h2>
+            <span style={{ fontSize: '0.75rem', opacity: 0.5, fontWeight: 700, textTransform: 'uppercase' }}>Quick Join</span>
+          </div>
+          {featuredQuizzes.map((quiz, i) => (
+            <div key={quiz._id} style={{ cursor: 'pointer' }} onClick={() => navigate('/explore')}>
+              <RoomPreviewCard 
+                title={quiz.title}
+                questions={quiz.questions?.length || 0}
+                host="Admin"
+                status="Waiting"
+              />
+            </div>
+          ))}
+          {featuredQuizzes.length === 0 && <RoomPreviewCard />}
         </motion.div>
       </motion.main>
 

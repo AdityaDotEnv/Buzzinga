@@ -33,7 +33,7 @@ export const getQuiz = async (req: Request, res: Response) => {
 
 export const getAllQuizzes = async (req: Request, res: Response) => {
   try {
-    const quizzes = await Quiz.find().select('title description createdAt');
+    const quizzes = await Quiz.find().select('title description questions timeLimit createdAt');
     res.status(200).json(quizzes);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching quizzes' });

@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Flag, Volume2, VolumeX, Flame, X } from 'lucide-react'
+import { Flag, Volume2, VolumeX, Flame, X, Users, Trophy } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import { socket } from '../../services/socket'
 import { EmojiBurst, HypeBar } from './components/EmojiBurst'
 import { AnswerBarChart, ArchitectMascot } from './components/HostSuspense'
 import { Timer } from '../../components/gameplay/Timer'
@@ -18,17 +20,7 @@ interface Question {
   options: [string, string, string, string]; correct: number
 }
 
-const QUESTIONS: Question[] = [
-  { id: 1, text: 'Which planet is known as the Red Planet?', options: ['Venus', 'Mars', 'Jupiter', 'Saturn'], correct: 1 },
-  { id: 2, text: 'What is the chemical symbol for Gold?', options: ['Go', 'Gd', 'Au', 'Ag'], correct: 2 },
-  { id: 3, text: 'How many sides does a hexagon have?', options: ['5', '6', '7', '8'], correct: 1 },
-  { id: 4, text: 'Who painted the Mona Lisa?', options: ['Michelangelo', 'Raphael', 'Da Vinci', 'Donatello'], correct: 2 },
-  { id: 5, text: 'What is the largest ocean on Earth?', options: ['Atlantic', 'Indian', 'Arctic', 'Pacific'], correct: 3 },
-]
-
-const TOTAL_Q = QUESTIONS.length
-const TIMER_SECONDS = 20
-const MOCK_PLAYERS = 8
+// Note: State now comes from Socket.IO
 
 
 /* ── Fire Edge ── */
@@ -89,93 +81,82 @@ function BlastOffOverlay({ onDone }: { onDone: () => void }) {
 
 /* ══════════════════════ MAIN PAGE ══════════════════════ */
 export function RoomCodePage() {
-  const roomCode = 'LIVE01'
+  const { roomCode } = useParams()
   const navigate = useNavigate()
-  const [phase, setPhase] = useState<Phase>('blastoff')
-  const [qIndex, setQIndex] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS)
+  const location = useLocation()
+  const role = useSelector((state: any) => state.auth.role)
+  const nickname = location.state?.nickname || (role === 'host' ? 'HOST' : `Player_${Math.floor(Math.random() * 1000)}`)
+
+  const [gameState, setGameState] = useState<any>(null)
   const [selected, setSelected] = useState<number | null>(null)
   const [streak, setStreak] = useState(0)
   const [score, setScore] = useState(0)
   const [sound, setSound] = useState(true)
-  const [answered, setAnswered] = useState(0) // mock host bar
-  const [answerTime, setAnswerTime] = useState(0)
   const [isExitOpen, setIsExitOpen] = useState(false)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const startTimeRef = useRef(Date.now())
+  
+  const prevPhaseRef = useRef<string>('waiting')
 
-  const q = QUESTIONS[qIndex]
-  const clearTimer = useCallback(() => { if (timerRef.current) clearTimeout(timerRef.current) }, [])
-
-  const goTimesUp = useCallback(() => {
-    clearTimer()
-    setPhase('timesup')
-    setTimeout(() => setPhase('result'), 1800)
-  }, [clearTimer])
-
-  /* Timer tick */
   useEffect(() => {
-    if (phase !== 'question' && phase !== 'locked') return
-    if (timeLeft <= 0) { goTimesUp(); return }
-    timerRef.current = setTimeout(() => setTimeLeft(t => t - 1), 1000)
-    return clearTimer
-  }, [phase, timeLeft, goTimesUp, clearTimer])
+    socket.connect()
+    socket.emit('join-room', { roomCode, nickname })
 
-  /* Mock: simulate other players answering over time */
-  useEffect(() => {
-    if (phase !== 'question') return
-    setAnswered(0)
-    const trickle = setInterval(() => {
-      setAnswered(prev => Math.min(prev + Math.floor(Math.random() * 2), MOCK_PLAYERS - 1))
-    }, 1800)
-    return () => clearInterval(trickle)
-  }, [phase, qIndex])
+    socket.on('state-update', (state) => {
+      console.log('Socket state update:', state)
+      setGameState(state)
 
-  /* Soundscape hook — placeholder: would drive Web Audio API pitch/tempo */
-  useEffect(() => {
-    if (!sound || (phase !== 'question' && phase !== 'locked')) return
-    // SOUND_HOOK: tension_music.setTempo(1 + (1 - timeLeft / TIMER_SECONDS) * 0.6)
-    // SOUND_HOOK: tension_music.setPitch(1 + (1 - timeLeft / TIMER_SECONDS) * 0.4)
-  }, [timeLeft, sound, phase])
+      // Reset local selection when moving to a new question
+      if (state.phase === 'question' && prevPhaseRef.current !== 'question') {
+        setSelected(null)
+      }
+      
+      // Update local score/streak if provided in player list
+      if (role !== 'host') {
+        const me = state.players?.find((p: any) => p.nickname === nickname)
+        if (me) {
+          setScore(me.score)
+          // Streak logic could be server-side too, but we keep local for now or sync
+        }
+      }
 
-  const handleBlastOffDone = () => { setPhase('question'); setTimeLeft(TIMER_SECONDS); startTimeRef.current = Date.now() }
+      prevPhaseRef.current = state.phase
+    })
+
+    return () => {
+      socket.off('state-update')
+      socket.disconnect()
+    }
+  }, [roomCode, nickname, role])
+
+  if (!gameState) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#06080f', color: '#fff' }}>
+        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
+          <Flag size={48} color="#06b6d4" />
+        </motion.div>
+      </div>
+    )
+  }
+
+  const { phase, timer, currentQuestionIndex, totalQuestions, players, question } = gameState
+  const answeredCount = players?.filter((p: any) => p.answered).length || 0
+  const isLastQuestion = currentQuestionIndex === totalQuestions - 1
 
   const handleAnswer = (idx: number) => {
-    if (phase !== 'question') return
-    const taken = Math.round((Date.now() - startTimeRef.current) / 1000)
-    setAnswerTime(taken)
+    if (phase !== 'question' || selected !== null || role === 'host') return
     setSelected(idx)
-    setAnswered(MOCK_PLAYERS) // all answered on lock-in (mock)
-    setPhase('locked')
-    const correct = idx === q.correct
-    if (correct) { setStreak(s => s + 1); setScore(s => s + Math.max(500, (TIMER_SECONDS - taken) * 80)) }
+    socket.emit('submit-answer', { roomCode, answerIndex: idx })
+    
+    // Local streak calculation for UI feedback
+    const correct = idx === question.correct
+    if (correct) setStreak(s => s + 1)
     else setStreak(0)
   }
 
-  const handleNext = useCallback(() => {
-    if (qIndex < TOTAL_Q - 1) {
-      setQIndex(i => i + 1); setSelected(null); setPhase('question')
-      setTimeLeft(TIMER_SECONDS); startTimeRef.current = Date.now()
-    } else {
-      // Quiz ended, do nothing or show final summary
-      // do not restart loop
-    }
-  }, [qIndex])
-
-  /* Auto-advance from result phase */
-  useEffect(() => {
-    if (phase !== 'result') return
-    if (qIndex >= TOTAL_Q - 1) return // Stop at the last question's result
-    const autoAdvance = setTimeout(() => {
-      handleNext()
-    }, 5000)
-    return () => clearTimeout(autoAdvance)
-  }, [phase, handleNext, qIndex])
 
   const handleExit = () => setIsExitOpen(true)
   const confirmExit = () => navigate('/')
 
-  const progressPct = (qIndex / TOTAL_Q) * 100
+  const progressPct = totalQuestions ? (currentQuestionIndex / totalQuestions) * 100 : 0
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#06080f',
@@ -195,8 +176,7 @@ export function RoomCodePage() {
       {/* Fire edges on streak ≥ 3 */}
       {streak >= 3 && phase === 'question' && <FireEdge />}
 
-      {/* Blast-off */}
-      <AnimatePresence>{phase === 'blastoff' && <BlastOffOverlay onDone={handleBlastOffDone} />}</AnimatePresence>
+      {/* Blast-off — server drives phases, so no local blastoff needed */}
 
       {/* ── Top Bar ── */}
       <div style={{ position: 'relative', zIndex: 10 }}>
@@ -213,7 +193,7 @@ export function RoomCodePage() {
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Question</div>
-            <div style={{ fontWeight: 900, fontSize: '1rem' }}>{qIndex + 1}<span style={{ color: 'rgba(255,255,255,0.28)' }}> / {TOTAL_Q}</span></div>
+            <div style={{ fontWeight: 900, fontSize: '1rem' }}>{currentQuestionIndex + 1}<span style={{ color: 'rgba(255,255,255,0.28)' }}> / {totalQuestions}</span></div>
           </div>
           <div style={{ display: 'flex', gap: '0.45rem' }}>
             <button onClick={() => setSound(s => !s)} title="Toggle sound"
@@ -233,7 +213,7 @@ export function RoomCodePage() {
       {/* ── Main Content ── */}
       <AnimatePresence mode="wait">
         {(phase === 'question' || phase === 'locked' || phase === 'result') && (
-          <motion.main key={`q-${qIndex}`}
+          <motion.main key={`q-${currentQuestionIndex}`}
             initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -24 }}
             transition={{ duration: 0.38, ease: 'easeOut' }}
             style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -243,12 +223,12 @@ export function RoomCodePage() {
             {/* Timer row */}
             <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
-                <Timer remaining={phase === 'result' ? 0 : timeLeft} total={TIMER_SECONDS} />
+                <Timer remaining={timer} total={15} />
               </div>
 
               {/* Mascot in center (host drama) */}
               <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-                <ArchitectMascot timeLeft={phase === 'locked' ? 0 : timeLeft} totalTime={TIMER_SECONDS} />
+                <ArchitectMascot timeLeft={timer} totalTime={15} />
               </div>
 
               {/* Score */}
@@ -263,18 +243,18 @@ export function RoomCodePage() {
 
             {/* Host answer count bar */}
             {(phase === 'question' || phase === 'locked') && (
-              <AnswerBarChart answered={answered} total={MOCK_PLAYERS} />
+              <AnswerBarChart answered={answeredCount} total={players?.length || 1} />
             )}
 
             {/* Question card */}
-            <QuestionCard question={q.text} />
+            <QuestionCard question={question?.text || ''} />
 
             {/* Answer Grid */}
             {phase !== 'result' && (
               <AnswerGrid 
-                options={q.options} 
+                options={question?.options || []} 
                 selected={selected} 
-                phase={phase} 
+                phase={selected !== null ? 'locked' : phase} 
                 onAnswer={handleAnswer} 
               />
             )}
@@ -285,13 +265,15 @@ export function RoomCodePage() {
               selected={selected}
               selectedColor={selected !== null ? SHAPE_CONFIG[selected].color : undefined}
               selectedGlow={selected !== null ? SHAPE_CONFIG[selected].glow : undefined}
-              answerTime={answerTime}
-              totalTime={TIMER_SECONDS}
-              questionCorrect={selected === q.correct}
+              answerTime={0}
+              totalTime={15}
+              questionCorrect={selected === question?.correct}
               playerScore={score}
               playerStreak={streak}
-              onNext={handleNext}
-              isLastQuestion={qIndex === TOTAL_Q - 1}
+              onNext={() => {}}
+              isLastQuestion={isLastQuestion}
+              isHostView={role === 'host'}
+              players={players}
             />
 
             {/* Hype bar — always visible when active */}
@@ -300,6 +282,23 @@ export function RoomCodePage() {
                 <HypeBar />
               </motion.div>
             )}
+          </motion.main>
+        )}
+
+        {phase === 'ended' && (
+          <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', gap: '2rem' }}>
+            <Trophy size={100} color="#fbbf24" />
+            <h2 style={{ fontSize: '3rem', fontWeight: 900 }}>Quiz Finished!</h2>
+            <div style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <h3 style={{ fontSize: '1.2rem', opacity: 0.6, textAlign: 'center' }}>Final Leaderboard</h3>
+              {players?.sort((a: any, b: any) => b.score - a.score).map((p: any, i: number) => (
+                <div key={p.nickname} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '1rem' }}>
+                   <span>{i+1}. {p.nickname}</span>
+                   <span style={{ fontWeight: 800 }}>{p.score}</span>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => navigate('/')} style={{ padding: '1rem 2rem', borderRadius: '1rem', background: '#06b6d4', border: 'none', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>Back to Home</button>
           </motion.main>
         )}
       </AnimatePresence>

@@ -23,7 +23,7 @@ const defaultLinks: NavLink[] = [
   { label: 'Home', href: '/' },
   { label: 'Create Quiz', href: '/create-quiz' },
   { label: 'Join Quiz', href: '/join' },
-  { label: 'Explore Quizzes', href: '#explore' },
+  { label: 'Explore Quizzes', href: '/explore' },
   { label: 'Leaderboards', href: '#leaderboards' },
 ]
 

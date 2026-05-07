@@ -49,9 +49,11 @@ interface LaunchModalProps {
   questionCount?: number;
   grade?: string;
   topic?: string;
+  quizId?: string;
+  hostSecret?: string;
 }
 
-export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic }: LaunchModalProps) {
+export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic, quizId, hostSecret }: LaunchModalProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [pin, setPin] = useState('------');
@@ -66,24 +68,40 @@ export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic }:
   // Fetch real room code from backend
   useEffect(() => {
     async function initRoom() {
+      console.log('Initializing room with quizId:', quizId);
       try {
-        // 1. Create a mock quiz first if no ID (for demo purposes)
-        const quiz = await quizApi.create({
-          title: quizTitle || 'New Quiz',
-          questions: [
-            { text: 'Sample Question?', options: ['A', 'B', 'C', 'D'], correct: 0 }
-          ],
-          creatorId: 'host-123'
-        });
+        let finalQuizId = quizId ? String(quizId) : undefined;
+        let finalHostSecret = hostSecret;
 
-        // Store hostSecret in Redux/localStorage
-        if (quiz.hostSecret) {
-          dispatch(setAuth({ hostSecret: quiz.hostSecret, role: 'host' }));
+        if (!finalQuizId) {
+          console.warn('No quizId provided, creating mock quiz...');
+          // 1. Create a mock quiz first if no ID (for demo purposes)
+          const quiz = await quizApi.create({
+            title: quizTitle || 'New Quiz',
+            questions: [
+              { text: 'Sample Question?', options: ['A', 'B', 'C', 'D'], correct: 0 }
+            ],
+            creatorId: 'host-123'
+          });
+          finalQuizId = quiz._id;
+          finalHostSecret = quiz.hostSecret;
         }
 
         // 2. Create the room linked to this quiz
-        const room = await roomApi.create(quiz._id, quiz.hostSecret);
-        setPin(room.roomCode);
+        console.log('Sending room creation request for quizId:', finalQuizId);
+        const room = await roomApi.create(finalQuizId!, finalHostSecret || '');
+        console.log('Room created response:', room);
+        
+        if (room.roomCode) {
+          setPin(room.roomCode);
+        } else {
+          console.error('Room creation failed: No roomCode returned');
+        }
+
+        // Store hostSecret from ROOM (it's the authoritative one for hosting)
+        if (room.hostSecret) {
+          dispatch(setAuth({ hostSecret: room.hostSecret, role: 'host' }));
+        }
       } catch (err) {
         console.error('Failed to create room:', err);
       } finally {
@@ -91,7 +109,7 @@ export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic }:
       }
     }
     initRoom();
-  }, [quizTitle, dispatch]);
+  }, [quizId, hostSecret, quizTitle, dispatch]);
 
   // Polling for players
   useEffect(() => {
@@ -288,7 +306,7 @@ export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic }:
             </div>
           </div>
 
-          <motion.button whileHover={{ scale: 1.02, boxShadow: '0 0 32px rgba(16,185,129,0.5)' }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/live')} disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.55rem', width: '100%', padding: '1.05rem', background: 'linear-gradient(135deg, #10b981, #06b6d4)', border: 'none', borderRadius: '1rem', color: '#022c22', fontSize: '1rem', fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', boxShadow: '0 0 20px rgba(16,185,129,0.35)', opacity: loading ? 0.7 : 1 }}>
+          <motion.button whileHover={{ scale: 1.02, boxShadow: '0 0 32px rgba(16,185,129,0.5)' }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/play/' + pin)} disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.55rem', width: '100%', padding: '1.05rem', background: 'linear-gradient(135deg, #10b981, #06b6d4)', border: 'none', borderRadius: '1rem', color: '#022c22', fontSize: '1rem', fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', boxShadow: '0 0 20px rgba(16,185,129,0.35)', opacity: loading ? 0.7 : 1 }}>
             <Zap size={19} fill="currentColor" /> {loading ? 'Initializing...' : 'Start Quiz Now'}
           </motion.button>
         </div>

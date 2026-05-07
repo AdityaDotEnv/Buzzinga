@@ -12,6 +12,7 @@ export interface IQuiz extends Document {
   questions: IQuestion[];
   hostSecret: string;
   creatorId: string;
+  timeLimit: number; // in seconds
   createdAt: Date;
 }
 
@@ -27,6 +28,7 @@ const QuizSchema: Schema = new Schema({
   questions: { type: [QuestionSchema], required: true },
   hostSecret: { type: String, required: true },
   creatorId: { type: String, required: true },
+  timeLimit: { type: Number, default: 15 },
   createdAt: { type: Date, default: Date.now }
 });
 

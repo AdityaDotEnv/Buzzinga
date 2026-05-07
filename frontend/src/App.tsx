@@ -5,11 +5,13 @@ import { JoinQuizPage } from './pages/join-quiz/JoinQuizPage'
 import { ManualQuizBuilderPage } from './pages/create-manual/ManualQuizBuilderPage'
 import { AIQuizGeneratorPage } from './pages/create-ai/AIQuizGeneratorPage'
 import { RoomCodePage } from './pages/play/RoomCodePage'
+import { ExploreQuizzesPage } from './pages/explore/ExploreQuizzesPage'
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/explore" element={<ExploreQuizzesPage />} />
       <Route path="/create-quiz" element={<CreateQuizPage />} />
       <Route path="/create/manual" element={<ManualQuizBuilderPage />} />
       <Route path="/create/ai" element={<AIQuizGeneratorPage />} />
