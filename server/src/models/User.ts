@@ -20,8 +20,8 @@ const UserSchema: Schema = new Schema(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
+      sparse: true,  // allows multiple null/missing values
       trim: true,
       lowercase: true,
     },

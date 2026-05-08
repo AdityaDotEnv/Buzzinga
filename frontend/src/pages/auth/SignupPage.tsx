@@ -166,7 +166,7 @@ export function SignupPage() {
 
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel} htmlFor="signup-email">
-                Email Address
+                Email Address <span style={{ opacity: 0.45, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional)</span>
               </label>
               <div className={styles.inputWrap}>
                 <svg
@@ -192,7 +192,6 @@ export function SignupPage() {
                   className={styles.authInput}
                   placeholder="you@example.com"
                   autoComplete="email"
-                  required
                 />
               </div>
             </div>
