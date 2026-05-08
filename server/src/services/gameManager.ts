@@ -64,13 +64,16 @@ class GameManager {
       this.rooms.set(roomCode, state);
     }
 
-    // Check if nickname taken
-    if (state.players.find(p => p.nickname === nickname)) {
-       // Reconnect logic or error? For now error.
-       // Actually, let's allow reconnect if same socket (not possible) or just join.
+    // Check if player already exists (reconnection or duplicate event)
+    const existingPlayer = state.players.find(p => p.nickname === nickname);
+    if (existingPlayer) {
+      existingPlayer.socketId = socket.id;
+      existingPlayer.userId = userId;
+      console.log(`Player ${nickname} reconnected to room ${roomCode}`);
+    } else {
+      state.players.push({ nickname, score: 0, socketId: socket.id, userId });
+      console.log(`Player ${nickname} joined room ${roomCode}`);
     }
-
-    state.players.push({ nickname, score: 0, socketId: socket.id, userId });
     socket.join(roomCode);
 
     // Start 30s countdown on first player
