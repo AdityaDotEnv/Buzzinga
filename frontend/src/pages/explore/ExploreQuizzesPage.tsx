@@ -61,13 +61,6 @@ export function ExploreQuizzesPage() {
         </header>
 
         <section>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Seeded Quizzes</h2>
-            <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.5rem 1rem', borderRadius: '0.75rem', color: '#fff', fontSize: '0.85rem', cursor: 'pointer' }}>
-              <Filter size={16} /> Filter
-            </button>
-          </div>
-
           {loading ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
@@ -75,47 +68,117 @@ export function ExploreQuizzesPage() {
               </motion.div>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
-              {quizzes.map((quiz) => (
-                <motion.article 
-                  key={quiz._id}
-                  whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}
-                  style={{ 
-                    background: 'rgba(15,23,42,0.6)', 
-                    borderRadius: '1.5rem', 
-                    overflow: 'hidden', 
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    backdropFilter: 'blur(20px)',
-                    display: 'flex',
-                    flexDirection: 'column'
-                  }}
-                >
-                  <div style={{ height: '160px', background: 'linear-gradient(135deg, #06b6d4, #a78bfa)', padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <span style={{ background: 'rgba(0,0,0,0.2)', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 800, width: 'fit-content', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trivia</span>
-                    <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, lineHeight: 1.2 }}>{quiz.title}</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
+              
+              {/* Community Quizzes Section */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Community Quizzes</h2>
+                  <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.5rem 1rem', borderRadius: '0.75rem', color: '#fff', fontSize: '0.85rem', cursor: 'pointer' }}>
+                    <Filter size={16} /> Filter
+                  </button>
+                </div>
+                {quizzes.filter(q => q.creator?.username && q.creator.username !== 'admin').length === 0 ? (
+                  <p style={{ color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>No community quizzes yet. Be the first to create one!</p>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
+                    {quizzes.filter(q => q.creator?.username && q.creator.username !== 'admin').map((quiz) => (
+                      <motion.article 
+                        key={quiz._id}
+                        whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}
+                        style={{ 
+                          background: 'rgba(15,23,42,0.6)', 
+                          borderRadius: '1.5rem', 
+                          overflow: 'hidden', 
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          backdropFilter: 'blur(20px)',
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
+                      >
+                        <div style={{ height: '160px', background: 'linear-gradient(135deg, #f472b6, #8b5cf6)', padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                          <span style={{ background: 'rgba(0,0,0,0.2)', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 800, width: 'fit-content', textTransform: 'uppercase', letterSpacing: '0.05em' }}>By {quiz.creator?.username}</span>
+                          <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, lineHeight: 1.2 }}>{quiz.title}</h3>
+                        </div>
+                        <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          <p style={{ margin: 0, fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>{quiz.description || 'No description provided.'}</p>
+                          <div style={{ display: 'flex', gap: '1rem', marginTop: 'auto' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', opacity: 0.6 }}>
+                              <Users size={14} /> 0 plays
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', opacity: 0.6 }}>
+                              <Clock size={14} /> {quiz.timeLimit}s
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
+                          <button 
+                            className="primary-button" 
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                            onClick={() => setLaunchingQuiz(quiz)}
+                          >
+                            <Play size={16} fill="currentColor" /> Play Now
+                          </button>
+                        </div>
+                      </motion.article>
+                    ))}
                   </div>
-                  <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <p style={{ margin: 0, fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>{quiz.description || 'No description provided.'}</p>
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: 'auto' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', opacity: 0.6 }}>
-                        <Users size={14} /> 0 plays
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', opacity: 0.6 }}>
-                        <Clock size={14} /> {quiz.timeLimit}s
-                      </div>
-                    </div>
+                )}
+              </div>
+
+              {/* Seeded Quizzes Section */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Seeded Quizzes</h2>
+                </div>
+                {quizzes.filter(q => !q.creator?.username || q.creator.username === 'admin').length === 0 ? (
+                  <p style={{ color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>No seeded quizzes available.</p>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
+                    {quizzes.filter(q => !q.creator?.username || q.creator.username === 'admin').map((quiz) => (
+                      <motion.article 
+                        key={quiz._id}
+                        whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}
+                        style={{ 
+                          background: 'rgba(15,23,42,0.6)', 
+                          borderRadius: '1.5rem', 
+                          overflow: 'hidden', 
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          backdropFilter: 'blur(20px)',
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
+                      >
+                        <div style={{ height: '160px', background: 'linear-gradient(135deg, #06b6d4, #a78bfa)', padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                          <span style={{ background: 'rgba(0,0,0,0.2)', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 800, width: 'fit-content', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trivia</span>
+                          <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, lineHeight: 1.2 }}>{quiz.title}</h3>
+                        </div>
+                        <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          <p style={{ margin: 0, fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>{quiz.description || 'No description provided.'}</p>
+                          <div style={{ display: 'flex', gap: '1rem', marginTop: 'auto' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', opacity: 0.6 }}>
+                              <Users size={14} /> 0 plays
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', opacity: 0.6 }}>
+                              <Clock size={14} /> {quiz.timeLimit}s
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
+                          <button 
+                            className="primary-button" 
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                            onClick={() => setLaunchingQuiz(quiz)}
+                          >
+                            <Play size={16} fill="currentColor" /> Play Now
+                          </button>
+                        </div>
+                      </motion.article>
+                    ))}
                   </div>
-                  <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
-                    <button 
-                      className="primary-button" 
-                      style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                      onClick={() => setLaunchingQuiz(quiz)}
-                    >
-                      <Play size={16} fill="currentColor" /> Play Now
-                    </button>
-                  </div>
-                </motion.article>
-              ))}
+                )}
+              </div>
+
             </div>
           )}
         </section>

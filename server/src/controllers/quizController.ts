@@ -54,11 +54,21 @@ export const getAllQuizzes = async (req: Request, res: Response) => {
   try {
     const quizzes = await Quiz.find().select('title description questions timeLimit createdAt creatorId');
     
-    // Map quizzes to include placeholder creator metadata
+    // Fetch unique creator IDs to resolve usernames
+    const creatorIds = [...new Set(quizzes.map(q => q.creatorId).filter(id => id && id !== 'admin'))];
+    let users = [];
+    try {
+      users = await User.find({ _id: { $in: creatorIds } }).select('username');
+    } catch (e) {
+      // Ignore valid ObjectId errors for bad creatorIds
+    }
+    const userMap = new Map(users.map(u => [u._id.toString(), u.username]));
+
+    // Map quizzes to include creator metadata
     const quizzesWithCreator = quizzes.map((quiz) => ({
       ...quiz.toObject(),
       creator: {
-        username: 'admin' // Placeholder until populated
+        username: userMap.get(quiz.creatorId) || 'admin'
       }
     }));
 
