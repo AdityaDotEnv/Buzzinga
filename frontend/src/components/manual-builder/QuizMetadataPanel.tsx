@@ -4,11 +4,20 @@ import { ChevronDown } from 'lucide-react';
 
 const TAGS = ['Education', 'History'];
 
-export function QuizMetadataPanel() {
+interface Props {
+  title: string;
+  setTitle: (t: string) => void;
+  description: string;
+  setDescription: (d: string) => void;
+  tags: string[];
+  setTags: (tags: string[] | ((prev: string[]) => string[])) => void;
+  difficulty: string;
+  setDifficulty: (diff: string) => void;
+}
+
+export function QuizMetadataPanel({ title, setTitle, description, setDescription, tags, setTags, difficulty, setDifficulty }: Props) {
   const [open, setOpen] = useState(true);
-  const [tags, setTags] = useState(TAGS);
   const [tagInput, setTagInput] = useState('');
-  const [difficulty, setDifficulty] = useState('Intermediate');
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && tagInput.trim()) {
@@ -80,6 +89,8 @@ export function QuizMetadataPanel() {
                   <label style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgba(203,213,225,0.7)' }}>Quiz Title</label>
                   <input
                     type="text"
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
                     placeholder="e.g. History 101: Midterm Review"
                     style={{
                       background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)',
@@ -92,6 +103,8 @@ export function QuizMetadataPanel() {
                   <label style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgba(203,213,225,0.7)' }}>Description</label>
                   <textarea
                     rows={3}
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
                     placeholder="Add a short description so players know what to expect..."
                     style={{
                       background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)',

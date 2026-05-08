@@ -3,31 +3,37 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { QuestionCardPlaceholder } from './QuestionCardPlaceholder';
 import { Plus } from 'lucide-react';
 
-interface QuestionItem { id: number }
+interface Props {
+  questions: any[];
+  setQuestions: React.Dispatch<React.SetStateAction<any[]>>;
+}
 
-export function QuestionCanvas() {
-  const [questions, setQuestions] = useState<QuestionItem[]>([{ id: 1 }, { id: 2 }]);
+export function QuestionCanvas({ questions, setQuestions }: Props) {
   const [nextId, setNextId] = useState(3);
 
   const addQuestion = () => {
-    setQuestions(q => [...q, { id: nextId }]);
+    setQuestions(q => [...q, { id: nextId.toString(), text: '', options: ['', '', '', ''], correct: 0 }]);
     setNextId(n => n + 1);
   };
 
-  const removeQuestion = (id: number) => {
+  const removeQuestion = (id: string) => {
     setQuestions(q => q.filter(q => q.id !== id));
   };
 
-  const duplicateQuestion = (id: number) => {
+  const duplicateQuestion = (id: string) => {
     const idx = questions.findIndex(q => q.id === id);
     if (idx === -1) return;
-    const newQ = { id: nextId };
+    const newQ = { ...questions[idx], id: nextId.toString() };
     setNextId(n => n + 1);
     setQuestions(q => [
       ...q.slice(0, idx + 1),
       newQ,
       ...q.slice(idx + 1),
     ]);
+  };
+
+  const updateQuestion = (id: string, updates: any) => {
+    setQuestions(q => q.map(item => item.id === id ? { ...item, ...updates } : item));
   };
 
   return (
@@ -65,6 +71,8 @@ export function QuestionCanvas() {
             >
               <QuestionCardPlaceholder
                 index={idx + 1}
+                questionData={item}
+                onChange={(updates: any) => updateQuestion(item.id, updates)}
                 onDelete={() => removeQuestion(item.id)}
                 onDuplicate={() => duplicateQuestion(item.id)}
               />

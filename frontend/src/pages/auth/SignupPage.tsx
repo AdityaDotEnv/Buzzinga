@@ -166,7 +166,7 @@ export function SignupPage() {
 
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel} htmlFor="signup-email">
-                Email Address
+                Email Address <span style={{ opacity: 0.45, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optional)</span>
               </label>
               <div className={styles.inputWrap}>
                 <svg
@@ -192,7 +192,6 @@ export function SignupPage() {
                   className={styles.authInput}
                   placeholder="you@example.com"
                   autoComplete="email"
-                  required
                 />
               </div>
             </div>
@@ -332,13 +331,13 @@ export function SignupPage() {
 
             <p className={styles.termsNote}>
               By signing up you agree to our{" "}
-              <button type="button" className={styles.termsLink}>
-                Terms
-              </button>{" "}
+              <Link to="/terms" className={styles.termsLink}>
+                Terms &amp; Conditions
+              </Link>{" "}
               and{" "}
-              <button type="button" className={styles.termsLink}>
+              <Link to="/privacy" className={styles.termsLink}>
                 Privacy Policy
-              </button>
+              </Link>
               .
             </p>
           </form>

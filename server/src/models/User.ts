@@ -5,6 +5,8 @@ export interface IUser extends Document {
   email: string;
   passwordHash: string;
   avatar?: string;
+  score: number;
+  quizzesPlayed: number;
   createdAt: Date;
 }
 
@@ -18,8 +20,8 @@ const UserSchema: Schema = new Schema(
     },
     email: {
       type: String,
-      required: true,
       unique: true,
+      sparse: true,  // allows multiple null/missing values
       trim: true,
       lowercase: true,
     },
@@ -29,6 +31,14 @@ const UserSchema: Schema = new Schema(
     },
     avatar: {
       type: String,
+    },
+    score: {
+      type: Number,
+      default: 0,
+    },
+    quizzesPlayed: {
+      type: Number,
+      default: 0,
     },
   },
   {

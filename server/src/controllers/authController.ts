@@ -8,9 +8,18 @@ export const signupUser = async (req: Request, res: Response): Promise<void> => 
   try {
     const { username, email, password } = req.body;
 
-    const userExists = await User.findOne({ $or: [{ email }, { username }] });
+    const userExists = await User.findOne({
+      $or: [
+        { username },
+        ...(email ? [{ email }] : [])
+      ]
+    });
     if (userExists) {
-      res.status(400).json({ message: 'User already exists' });
+      if (userExists.username === username) {
+        res.status(400).json({ message: 'Username already taken' });
+      } else {
+        res.status(400).json({ message: 'Email already registered' });
+      }
       return;
     }
 
@@ -40,9 +49,9 @@ export const signupUser = async (req: Request, res: Response): Promise<void> => 
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
 
     if (user && (await bcrypt.compare(password, user.passwordHash))) {
       res.json({
@@ -52,7 +61,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         token: generateToken(user._id as any),
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ message: 'Invalid username or password' });
     }
   } catch (error: any) {
     res.status(500).json({ message: error.message });

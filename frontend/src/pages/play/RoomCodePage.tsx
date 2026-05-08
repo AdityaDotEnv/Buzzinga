@@ -160,9 +160,13 @@ export function RoomCodePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const role = useSelector((state: any) => state.auth.role);
+  const storedUser = (() => { try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; } })();
+  const storedUsername = storedUser?.username || null;
   const nickname =
     location.state?.nickname ||
+    storedUsername ||
     (role === "host" ? "HOST" : `Player_${Math.floor(Math.random() * 1000)}`);
+  const userId = storedUser?._id || null;
 
   const [gameState, setGameState] = useState<any>(null);
   const [selected, setSelected] = useState<number | null>(null);
@@ -175,7 +179,7 @@ export function RoomCodePage() {
 
   useEffect(() => {
     socket.connect();
-    socket.emit("join-room", { roomCode, nickname });
+    socket.emit("join-room", { roomCode, nickname, userId });
 
     socket.on("state-update", (state) => {
       console.log("Socket state update:", state);

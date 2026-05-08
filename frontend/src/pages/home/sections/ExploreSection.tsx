@@ -1,6 +1,22 @@
+import { useEffect, useState } from 'react'
 import { leaderboardPlayers, trendingQuizzes } from '../content'
+import { Link } from 'react-router-dom'
+
+interface LiveEntry {
+  username: string;
+  score: number;
+  quizzesPlayed: number;
+}
 
 export function ExploreSection() {
+  const [liveTop, setLiveTop] = useState<LiveEntry[]>([]);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/leaderboard/global?limit=4')
+      .then(r => r.json())
+      .then(res => { if (res.data?.length) setLiveTop(res.data); })
+      .catch(() => {});
+  }, []);
   return (
     <section className="extras-section" id="explore">
       <div className="extras-left">
@@ -29,24 +45,44 @@ export function ExploreSection() {
         <article className="leaderboard-preview glass-card">
           <div className="card-head">
             <div>
-              <span className="card-kicker">Live room</span>
-              <h2>Buzzinga Cup</h2>
+              <span className="card-kicker">{liveTop.length ? 'Global top scorers' : 'Live room'}</span>
+              <h2>{liveTop.length ? 'Leaderboard' : 'Buzzinga Cup'}</h2>
             </div>
-            <span className="timer-badge success">95% accuracy</span>
+            <span className="timer-badge success">{liveTop.length ? `${liveTop.length} players` : '95% accuracy'}</span>
           </div>
           <div className="leaderboard-list compact">
-            {leaderboardPlayers.slice(0, 4).map((player, index) => (
-              <div key={player.name} className={`leaderboard-row ${player.name === 'You' ? 'is-you' : ''}`}>
-                <span className="rank">{index + 1}</span>
-                <span className="avatar">{player.avatar}</span>
-                <div className="leaderboard-meta">
-                  <strong>{player.name}</strong>
-                  <span>{player.score} pts</span>
+            {liveTop.length
+              ? liveTop.map((entry, index) => (
+                <div key={entry.username} className="leaderboard-row">
+                  <span className="rank">{index + 1}</span>
+                  <span className="avatar">{entry.username.charAt(0).toUpperCase()}</span>
+                  <div className="leaderboard-meta">
+                    <strong>{entry.username}</strong>
+                    <span>{entry.score.toLocaleString()} pts</span>
+                  </div>
+                  <span className="delta positive">#{index + 1}</span>
                 </div>
-                <span className="delta positive">+{player.delta}</span>
-              </div>
-            ))}
+              ))
+              : leaderboardPlayers.slice(0, 4).map((player, index) => (
+                <div key={player.name} className={`leaderboard-row ${player.name === 'You' ? 'is-you' : ''}`}>
+                  <span className="rank">{index + 1}</span>
+                  <span className="avatar">{player.avatar}</span>
+                  <div className="leaderboard-meta">
+                    <strong>{player.name}</strong>
+                    <span>{player.score} pts</span>
+                  </div>
+                  <span className="delta positive">+{player.delta}</span>
+                </div>
+              ))
+            }
           </div>
+          <Link to="/leaderboards" style={{
+            display: 'block', textAlign: 'center', marginTop: '0.75rem',
+            fontSize: '0.8rem', color: 'rgba(103,232,249,0.8)', textDecoration: 'none',
+            fontWeight: 600, letterSpacing: '0.04em',
+          }}>
+            View full leaderboard →
+          </Link>
         </article>
 
         <article className="mini-stack">

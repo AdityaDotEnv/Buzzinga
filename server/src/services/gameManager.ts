@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import Quiz from '../models/quizModel';
 import Room from '../models/roomModel';
+import User from '../models/User';
 
 interface GameState {
   roomCode: string;
@@ -9,7 +10,7 @@ interface GameState {
   questions: any[];
   currentQuestionIndex: number;
   phase: 'waiting' | 'countdown' | 'question' | 'locked' | 'result' | 'ended';
-  players: { nickname: string; score: number; socketId: string }[];
+  players: { nickname: string; score: number; socketId: string; userId?: string }[];
   timer: number;
   autoStartTimer?: NodeJS.Timeout;
   gameLoopTimer?: NodeJS.Timeout;
@@ -26,13 +27,14 @@ class GameManager {
 
   public init() {
     this.io.on('connection', (socket: Socket) => {
-      socket.on('join-room', ({ roomCode, nickname }) => this.handleJoinRoom(socket, roomCode, nickname));
+      socket.on('join-room', ({ roomCode, nickname, userId }) => this.handleJoinRoom(socket, roomCode, nickname, userId));
       socket.on('submit-answer', ({ roomCode, answerIndex }) => this.handleSubmitAnswer(socket, roomCode, answerIndex));
+      socket.on('host-start', ({ roomCode }) => this.handleHostStart(socket, roomCode));
       socket.on('disconnect', () => this.handleDisconnect(socket));
     });
   }
 
-  private async handleJoinRoom(socket: Socket, roomCode: string, nickname: string) {
+  private async handleJoinRoom(socket: Socket, roomCode: string, nickname: string, userId?: string) {
     let state = this.rooms.get(roomCode);
 
     if (!state) {
@@ -68,7 +70,7 @@ class GameManager {
        // Actually, let's allow reconnect if same socket (not possible) or just join.
     }
 
-    state.players.push({ nickname, score: 0, socketId: socket.id });
+    state.players.push({ nickname, score: 0, socketId: socket.id, userId });
     socket.join(roomCode);
 
     // Start 30s countdown on first player
@@ -124,6 +126,8 @@ class GameManager {
             state.phase = 'ended';
             clearInterval(state.gameLoopTimer);
             await Room.findOneAndUpdate({ roomCode: state.roomCode }, { status: 'ended' });
+            // Persist scores to User accounts for logged-in players
+            await this.flushScoresToDB(state);
           }
         }
       }
@@ -159,6 +163,27 @@ class GameManager {
 
     // Check if all players answered? Not required for auto-pilot but good for speed.
     // For now, just wait for timer.
+  }
+
+  private handleHostStart(socket: Socket, roomCode: string) {
+    const state = this.rooms.get(roomCode);
+    if (!state) return;
+    if (state.phase === 'waiting' || state.phase === 'countdown') {
+      if (state.autoStartTimer) clearInterval(state.autoStartTimer);
+      this.startQuiz(state);
+    }
+  }
+
+  private async flushScoresToDB(state: GameState) {
+    const updates = state.players
+      .filter(p => p.userId)
+      .map(p =>
+        User.findByIdAndUpdate(p.userId, {
+          $inc: { score: p.score, quizzesPlayed: 1 }
+        })
+      );
+    await Promise.all(updates);
+    console.log(`Flushed scores for ${updates.length} authenticated players in room ${state.roomCode}`);
   }
 
   private handleDisconnect(socket: Socket) {

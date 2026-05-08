@@ -26,13 +26,12 @@ export const createQuiz = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getQuiz = async (req: Request, res: Response) => {
+export const getQuiz = async (req: AuthRequest, res: Response) => {
   try {
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
     
-    // Placeholder ownership validation
-    const isOwner = false; // Add real check later: req.user?.id === quiz.creatorId
+    const isOwner = req.user && quiz.creatorId === req.user.id;
 
     // Attach creator metadata
     const user = await User.findById(quiz.creatorId).catch(() => null);
@@ -54,16 +53,59 @@ export const getAllQuizzes = async (req: Request, res: Response) => {
   try {
     const quizzes = await Quiz.find().select('title description questions timeLimit createdAt creatorId');
     
-    // Map quizzes to include placeholder creator metadata
+    // Fetch unique creator IDs to resolve usernames
+    const creatorIds = [...new Set(quizzes.map(q => q.creatorId).filter(id => id && id !== 'admin'))];
+    let users = [];
+    try {
+      users = await User.find({ _id: { $in: creatorIds } }).select('username');
+    } catch (e) {
+      // Ignore valid ObjectId errors for bad creatorIds
+    }
+    const userMap = new Map(users.map(u => [u._id.toString(), u.username]));
+
+    // Map quizzes to include creator metadata and ownership
     const quizzesWithCreator = quizzes.map((quiz) => ({
       ...quiz.toObject(),
       creator: {
-        username: 'admin' // Placeholder until populated
-      }
+        username: userMap.get(quiz.creatorId) || 'admin'
+      },
+      isOwner: req.user && quiz.creatorId === req.user.id
     }));
 
     res.status(200).json(quizzesWithCreator);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching quizzes' });
+  }
+};
+
+export const updateQuiz = async (req: AuthRequest, res: Response) => {
+  try {
+    const { title, description, questions, tags, difficulty, timeLimit } = req.body;
+    const quizId = req.params.id;
+
+    const quiz = await Quiz.findById(quizId);
+
+    if (!quiz) {
+      return res.status(404).json({ message: 'Quiz not found' });
+    }
+
+    // Check ownership
+    if (quiz.creatorId !== req.user?.id && req.user?.id !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized to update this quiz' });
+    }
+
+    quiz.title = title || quiz.title;
+    quiz.description = description || quiz.description;
+    quiz.questions = questions || quiz.questions;
+    quiz.tags = tags || quiz.tags;
+    quiz.difficulty = difficulty || quiz.difficulty;
+    quiz.timeLimit = timeLimit || quiz.timeLimit;
+
+    await quiz.save();
+
+    res.status(200).json(quiz);
+  } catch (error) {
+    console.error('Update Quiz Error:', error);
+    res.status(500).json({ message: 'Error updating quiz' });
   }
 };

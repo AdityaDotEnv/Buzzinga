@@ -13,6 +13,8 @@ export interface IQuiz extends Document {
   hostSecret: string;
   creatorId: string;
   timeLimit: number; // in seconds
+  tags?: string[];
+  difficulty?: string;
   createdAt: Date;
 }
 
@@ -29,6 +31,8 @@ const QuizSchema: Schema = new Schema({
   hostSecret: { type: String, required: true },
   creatorId: { type: String, required: true },
   timeLimit: { type: Number, default: 15 },
+  tags: { type: [String], default: [] },
+  difficulty: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Intermediate' },
   createdAt: { type: Date, default: Date.now }
 });
 

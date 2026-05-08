@@ -4,7 +4,7 @@ import styles from "./AuthPage.module.css";
 import { Navbar } from "../../components/layout/Navbar";
 
 export function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,7 @@ export function LoginPage() {
       const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
 
@@ -115,8 +115,8 @@ export function LoginPage() {
           {/* Form */}
           <form onSubmit={handleLogin} className={styles.authForm} noValidate>
             <div className={styles.fieldGroup}>
-              <label className={styles.fieldLabel} htmlFor="login-email">
-                Email Address
+              <label className={styles.fieldLabel} htmlFor="login-username">
+                Username
               </label>
               <div className={styles.inputWrap}>
                 <svg
@@ -131,17 +131,17 @@ export function LoginPage() {
                   strokeLinejoin="round"
                   aria-hidden="true"
                 >
-                  <rect x="2" y="4" width="20" height="16" rx="2" />
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
                 </svg>
                 <input
-                  id="login-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="login-username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className={styles.authInput}
-                  placeholder="you@example.com"
-                  autoComplete="email"
+                  placeholder="quizmaster99"
+                  autoComplete="username"
                   required
                 />
               </div>
@@ -264,6 +264,17 @@ export function LoginPage() {
             <Link to="/signup" className={styles.authLink}>
               Create one free
             </Link>
+          </p>
+          <p className={styles.termsNote} style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+            By continuing you agree to our{" "}
+            <Link to="/terms" className={styles.termsLink}>
+              Terms
+            </Link>{" "}
+            &amp;{" "}
+            <Link to="/privacy" className={styles.termsLink}>
+              Privacy Policy
+            </Link>
+            .
           </p>
         </div>
 

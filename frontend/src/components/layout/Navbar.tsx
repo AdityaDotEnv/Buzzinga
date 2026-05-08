@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
+import { LayoutDashboard, Trophy, Settings, LogOut, ChevronDown } from 'lucide-react'
 import buzzingaLogo from '../../assets/buzzinga-logo.png'
 import styles from './Navbar.module.css'
 
@@ -24,7 +25,7 @@ const defaultLinks: NavLink[] = [
   { label: 'Create Quiz', href: '/create-quiz' },
   { label: 'Join Quiz', href: '/join' },
   { label: 'Explore Quizzes', href: '/explore' },
-  { label: 'Leaderboards', href: '#leaderboards' },
+  { label: 'Leaderboards', href: '/leaderboards' },
 ]
 
 export function Navbar({
@@ -47,6 +48,27 @@ export function Navbar({
       </a>
     )
 
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser))
+      } catch (e) {
+        console.error('Failed to parse user', e)
+      }
+    }
+  }, [])
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault()
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setUser(null)
+    window.location.href = '/'
+  }
+
 return (
     <header className={styles.navbar}>
       <Link className={styles.brand} to={brandHref} aria-label="Buzzinga home">
@@ -59,23 +81,48 @@ return (
 
       <div className={styles.navActions}>
         {rightContent}
-        <details className={styles.profileMenu}>
-          <summary>
-            <span className={`${styles.avatar} ${styles.avatarSmall}`}>U</span>
-            Profile
-          </summary>
-          <div className={styles.menuPanel}>
-            <a href="#">Dashboard</a>
-            <a href="#">Achievements</a>
-            <a href="#">Settings</a>
-          </div>
-        </details>
-        <Link className="ghost-button" to="/login">
-          Log in
-        </Link>
-        <Link className="primary-button" to="/signup">
-          Sign up
-        </Link>
+        {user ? (
+          <details className={styles.profileMenu}>
+            <summary>
+              <span className={`${styles.avatar} ${styles.avatarSmall}`}>
+                {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
+              </span>
+              {user.username || 'Profile'}
+              <ChevronDown size={14} style={{ marginLeft: '0.25rem', opacity: 0.6, flexShrink: 0 }} />
+            </summary>
+            <div className={styles.menuPanel}>
+              <Link to="/analytics" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <LayoutDashboard size={15} style={{ opacity: 0.7 }} />
+                Dashboard
+              </Link>
+              <Link to="/leaderboards" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <Trophy size={15} style={{ opacity: 0.7 }} />
+                Achievements
+              </Link>
+              <Link to="/settings" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <Settings size={15} style={{ opacity: 0.7 }} />
+                Settings
+              </Link>
+              <a
+                href="#"
+                onClick={handleLogout}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#f87171' }}
+              >
+                <LogOut size={15} style={{ opacity: 0.85 }} />
+                Log out
+              </a>
+            </div>
+          </details>
+        ) : (
+          <>
+            <Link className="ghost-button" to="/login">
+              Log in
+            </Link>
+            <Link className="primary-button" to="/signup">
+              Sign up
+            </Link>
+          </>
+        )}
       </div>
 
       <button
@@ -106,12 +153,25 @@ return (
           ),
         )}
         <div className={styles.mobileDrawerActions}>
-          <Link className="ghost-button" to="/login" onClick={onToggleMobileMenu}>
-            Log in
-          </Link>
-          <Link className="primary-button" to="/signup" onClick={onToggleMobileMenu}>
-            Sign up
-          </Link>
+          {user ? (
+            <>
+              <div style={{ padding: '0 1rem', marginBottom: '1rem', color: 'rgba(226, 232, 240, 0.85)', fontWeight: 600 }}>
+                {user.username}
+              </div>
+              <a className="ghost-button" href="#" onClick={(e) => { handleLogout(e); onToggleMobileMenu(); }}>
+                Log out
+              </a>
+            </>
+          ) : (
+            <>
+              <Link className="ghost-button" to="/login" onClick={onToggleMobileMenu}>
+                Log in
+              </Link>
+              <Link className="primary-button" to="/signup" onClick={onToggleMobileMenu}>
+                Sign up
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
