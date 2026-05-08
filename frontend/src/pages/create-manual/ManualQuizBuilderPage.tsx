@@ -7,16 +7,20 @@ import { QuestionSettingsSidebar } from '../../components/manual-builder/Questio
 import { Navbar } from '../../components/layout/Navbar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { SuccessToast } from '../../components/join/SuccessToast';
+import { ErrorToast } from '../../components/shared/ErrorToast';
 import '../../App.css';
 
 export function ManualQuizBuilderPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [showToast, setShowToast] = useState(false);
+  const [errorToast, setErrorToast] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState<string[]>(['Education', 'History']);
   const [difficulty, setDifficulty] = useState('Intermediate');
+  const [timeLimit, setTimeLimit] = useState(30);
   const [questions, setQuestions] = useState<any[]>([
     { id: '1', text: 'What is the primary function of a mitochondria?', options: ['Photosynthesis', 'Protein synthesis', 'Cell division', 'Powerhouse of the cell'], correct: 3 },
   ]);
@@ -25,13 +29,18 @@ export function ManualQuizBuilderPage() {
     if (id) {
       const fetchQuiz = async () => {
         try {
-          const res = await fetch(`http://localhost:5000/api/quizzes/${id}`);
+          const res = await fetch(`http://localhost:5000/api/quizzes/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
           if (res.ok) {
             const data = await res.json();
             setTitle(data.title);
             setDescription(data.description);
             setTags(data.tags || []);
             setDifficulty(data.difficulty || 'Intermediate');
+            setTimeLimit(data.timeLimit || 30);
             if (data.questions && data.questions.length > 0) {
               setQuestions(data.questions.map((q: any, idx: number) => ({
                 id: q._id || String(idx + 1),
@@ -50,6 +59,17 @@ export function ManualQuizBuilderPage() {
   }, [id]);
 
   const handleSaveDraft = async () => {
+    if (isSaving) return;
+    
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('Save Draft Failed: No auth token found in localStorage');
+      setErrorToast('You must be logged in to save a quiz.');
+      setTimeout(() => navigate('/login'), 3000);
+      return;
+    }
+
+    setIsSaving(true);
     try {
       const url = id 
         ? `http://localhost:5000/api/quizzes/${id}` 
@@ -59,13 +79,14 @@ export function ManualQuizBuilderPage() {
         method: id ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           title: title || 'Untitled Quiz',
           description: description || 'No description',
           tags,
           difficulty,
+          timeLimit,
           questions: questions.map(q => ({
             text: q.text || 'Untitled Question',
             options: q.options || ['A', 'B', 'C', 'D'],
@@ -73,15 +94,27 @@ export function ManualQuizBuilderPage() {
           }))
         })
       });
+
+      const data = await res.json();
+
       if (res.ok) {
+        console.log('Quiz saved successfully:', data);
         setShowToast(true);
+        // If it was a new quiz, update the URL to include the ID
+        if (!id && data._id) {
+          window.history.replaceState(null, '', `/create/manual/${data._id}`);
+        }
         setTimeout(() => navigate('/explore'), 2000);
       } else {
-        alert('Failed to save draft. Please ensure you are logged in.');
+        const errorMsg = data.message || 'Unknown server error';
+        console.error(`Save Draft Failed (${res.status}):`, data);
+        setErrorToast(`Failed to save draft: ${errorMsg}`);
       }
-    } catch (e) {
-      console.error(e);
-      alert('Error saving draft');
+    } catch (e: any) {
+      console.error('Save Draft Error:', e);
+      setErrorToast(`Error saving draft: ${e.message}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -172,7 +205,12 @@ export function ManualQuizBuilderPage() {
           </div>
 
           {/* Right: sticky control tower */}
-          <QuestionSettingsSidebar onSaveDraft={handleSaveDraft} />
+          <QuestionSettingsSidebar 
+            onSaveDraft={handleSaveDraft} 
+            isSaving={isSaving} 
+            timeLimit={timeLimit}
+            setTimeLimit={setTimeLimit}
+          />
         </div>
       </div>
 
@@ -190,6 +228,12 @@ export function ManualQuizBuilderPage() {
           <SuccessToast 
             message="Draft saved successfully!" 
             onClose={() => setShowToast(false)} 
+          />
+        )}
+        {errorToast && (
+          <ErrorToast 
+            message={errorToast} 
+            onClose={() => setErrorToast(null)} 
           />
         )}
       </AnimatePresence>

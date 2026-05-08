@@ -6,7 +6,7 @@ import crypto from 'crypto';
 
 export const createQuiz = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, questions } = req.body;
+    const { title, description, questions, tags, difficulty, timeLimit } = req.body;
     const hostSecret = crypto.randomBytes(16).toString('hex');
     
     // Use authenticated user if available
@@ -18,11 +18,15 @@ export const createQuiz = async (req: AuthRequest, res: Response) => {
       questions,
       hostSecret,
       creatorId,
+      tags: tags || [],
+      difficulty: difficulty || 'Intermediate',
+      timeLimit: timeLimit || 15
     });
 
     res.status(201).json(quiz);
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating quiz' });
+  } catch (error: any) {
+    console.error('Create Quiz Error:', error);
+    res.status(500).json({ message: error.message || 'Error creating quiz' });
   }
 };
 
