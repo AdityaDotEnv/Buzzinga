@@ -42,6 +42,7 @@ const footerColumns: Array<{ title: string; links: FooterLink[] }> = [
       { label: 'Careers', href: '/careers' },
       { label: 'Contact', href: '/contact' },
       { label: 'Privacy', href: '/privacy' },
+      { label: 'Terms', href: '/terms' },
     ],
   },
 ]

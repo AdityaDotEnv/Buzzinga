@@ -331,13 +331,13 @@ export function SignupPage() {
 
             <p className={styles.termsNote}>
               By signing up you agree to our{" "}
-              <button type="button" className={styles.termsLink}>
-                Terms
-              </button>{" "}
+              <Link to="/terms" className={styles.termsLink}>
+                Terms &amp; Conditions
+              </Link>{" "}
               and{" "}
-              <button type="button" className={styles.termsLink}>
+              <Link to="/privacy" className={styles.termsLink}>
                 Privacy Policy
-              </button>
+              </Link>
               .
             </p>
           </form>

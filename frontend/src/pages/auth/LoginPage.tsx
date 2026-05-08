@@ -265,6 +265,17 @@ export function LoginPage() {
               Create one free
             </Link>
           </p>
+          <p className={styles.termsNote} style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+            By continuing you agree to our{" "}
+            <Link to="/terms" className={styles.termsLink}>
+              Terms
+            </Link>{" "}
+            &amp;{" "}
+            <Link to="/privacy" className={styles.termsLink}>
+              Privacy Policy
+            </Link>
+            .
+          </p>
         </div>
 
         {/* Floating accent cards */}

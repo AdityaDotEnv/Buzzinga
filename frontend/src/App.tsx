@@ -24,6 +24,7 @@ import { AboutPage } from './pages/misc/AboutPage'
 import { CareersPage } from './pages/misc/CareersPage'
 import { ContactPage } from './pages/misc/ContactPage'
 import { PrivacyPage } from './pages/misc/PrivacyPage'
+import { TermsPage } from './pages/misc/TermsPage'
 
 export default function App() {
   return (
@@ -55,6 +56,7 @@ export default function App() {
       <Route path="/careers" element={<CareersPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
