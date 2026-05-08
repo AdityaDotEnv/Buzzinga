@@ -8,6 +8,27 @@ import { Footer } from '../../components/layout/Footer';
 import { LaunchModal } from '../../components/shared/LaunchModal';
 import styles from '../home/HomePage.module.css';
 
+const CARD_GRADIENTS = [
+  'linear-gradient(135deg, #f472b6, #8b5cf6)',
+  'linear-gradient(135deg, #06b6d4, #6366f1)',
+  'linear-gradient(135deg, #f59e0b, #ef4444)',
+  'linear-gradient(135deg, #10b981, #06b6d4)',
+  'linear-gradient(135deg, #ec4899, #f97316)',
+  'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+  'linear-gradient(135deg, #f43f5e, #8b5cf6)',
+  'linear-gradient(135deg, #22d3ee, #4ade80)',
+  'linear-gradient(135deg, #a78bfa, #f472b6)',
+  'linear-gradient(135deg, #fb923c, #facc15)',
+];
+
+function pickGradient(id: string): string {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash * 31 + id.charCodeAt(i)) & 0xffff;
+  }
+  return CARD_GRADIENTS[hash % CARD_GRADIENTS.length];
+}
+
 export function ExploreQuizzesPage() {
   const [quizzes, setQuizzes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,7 +117,7 @@ export function ExploreQuizzesPage() {
                           flexDirection: 'column'
                         }}
                       >
-                        <div style={{ height: '160px', background: 'linear-gradient(135deg, #f472b6, #8b5cf6)', padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div style={{ height: '160px', background: pickGradient(quiz._id || quiz.title), padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                           <span style={{ background: 'rgba(0,0,0,0.2)', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 800, width: 'fit-content', textTransform: 'uppercase', letterSpacing: '0.05em' }}>By {quiz.creator?.username}</span>
                           <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, lineHeight: 1.2 }}>{quiz.title}</h3>
                         </div>
@@ -149,7 +170,7 @@ export function ExploreQuizzesPage() {
                           flexDirection: 'column'
                         }}
                       >
-                        <div style={{ height: '160px', background: 'linear-gradient(135deg, #06b6d4, #a78bfa)', padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div style={{ height: '160px', background: pickGradient(quiz._id || quiz.title), padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                           <span style={{ background: 'rgba(0,0,0,0.2)', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 800, width: 'fit-content', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trivia</span>
                           <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, lineHeight: 1.2 }}>{quiz.title}</h3>
                         </div>
