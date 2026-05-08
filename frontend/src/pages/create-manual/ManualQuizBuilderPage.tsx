@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BuilderHero } from '../../components/manual-builder/BuilderHero';
 import { QuizMetadataPanel } from '../../components/manual-builder/QuizMetadataPanel';
 import { QuestionCanvas } from '../../components/manual-builder/QuestionCanvas';
 import { QuestionSettingsSidebar } from '../../components/manual-builder/QuestionSettingsSidebar';
 import { Navbar } from '../../components/layout/Navbar';
 import { useNavigate } from 'react-router-dom';
+import { SuccessToast } from '../../components/join/SuccessToast';
 import '../../App.css';
 
 export function ManualQuizBuilderPage() {
   const navigate = useNavigate();
+  const [showToast, setShowToast] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [questions, setQuestions] = useState<any[]>([
@@ -35,8 +37,8 @@ export function ManualQuizBuilderPage() {
         })
       });
       if (res.ok) {
-        alert('Draft saved successfully!');
-        navigate('/explore');
+        setShowToast(true);
+        setTimeout(() => navigate('/explore'), 2000);
       } else {
         alert('Failed to save draft. Please ensure you are logged in.');
       }
@@ -139,6 +141,16 @@ export function ManualQuizBuilderPage() {
           }
         }
       `}</style>
+
+      {/* Success Toast Overlay */}
+      <AnimatePresence>
+        {showToast && (
+          <SuccessToast 
+            message="Draft saved successfully!" 
+            onClose={() => setShowToast(false)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
