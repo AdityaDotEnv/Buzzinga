@@ -5,9 +5,12 @@ import { LaunchModal } from '../shared/LaunchModal';
 
 interface Props {
   onSaveDraft?: () => void;
+  isSaving?: boolean;
+  timeLimit: number;
+  setTimeLimit: (t: number) => void;
 }
 
-export function QuestionSettingsSidebar({ onSaveDraft }: Props) {
+export function QuestionSettingsSidebar({ onSaveDraft, isSaving, timeLimit, setTimeLimit }: Props) {
   const [showLaunch, setShowLaunch] = useState(false);
   return (
     <motion.div
@@ -46,11 +49,15 @@ export function QuestionSettingsSidebar({ onSaveDraft }: Props) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'rgba(203,213,225,0.8)', fontSize: '0.82rem', fontWeight: 600 }}>
           <Clock size={15} /> Time per Question
         </div>
-        <select style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '0.65rem', padding: '0.65rem 1rem', color: '#f8fafc', fontFamily: 'inherit', fontSize: '0.88rem', outline: 'none', cursor: 'pointer' }}>
-          <option>10 seconds</option>
-          <option>20 seconds</option>
-          <option>30 seconds</option>
-          <option>1 minute</option>
+        <select 
+          value={timeLimit}
+          onChange={(e) => setTimeLimit(Number(e.target.value))}
+          style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '0.65rem', padding: '0.65rem 1rem', color: '#f8fafc', fontFamily: 'inherit', fontSize: '0.88rem', outline: 'none', cursor: 'pointer' }}
+        >
+          <option value={10}>10 seconds</option>
+          <option value={20}>20 seconds</option>
+          <option value={30}>30 seconds</option>
+          <option value={60}>1 minute</option>
         </select>
       </div>
 
@@ -93,11 +100,12 @@ export function QuestionSettingsSidebar({ onSaveDraft }: Props) {
       {/* Save draft */}
       <motion.button
         onClick={onSaveDraft}
+        disabled={isSaving}
         whileHover={{ scale: 1.02, boxShadow: '0 0 28px rgba(236,72,153,0.5)' }}
         whileTap={{ scale: 0.96 }}
-        style={{ width: '100%', padding: '0.85rem', borderRadius: '0.85rem', background: 'linear-gradient(135deg, #ec4899, #a855f7)', border: 'none', color: '#fff', fontSize: '0.88rem', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 0 16px rgba(236,72,153,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+        style={{ width: '100%', padding: '0.85rem', borderRadius: '0.85rem', background: isSaving ? 'rgba(236,72,153,0.3)' : 'linear-gradient(135deg, #ec4899, #a855f7)', border: 'none', color: '#fff', fontSize: '0.88rem', fontWeight: 700, fontFamily: 'inherit', cursor: isSaving ? 'not-allowed' : 'pointer', boxShadow: '0 0 16px rgba(236,72,153,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', opacity: isSaving ? 0.7 : 1 }}
       >
-        ✨ Save Draft
+        {isSaving ? 'Saving...' : '✨ Save Draft'}
       </motion.button>
 
       {/* Launch Live Game */}

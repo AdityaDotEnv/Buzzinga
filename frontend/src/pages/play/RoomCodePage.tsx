@@ -452,11 +452,33 @@ export function RoomCodePage() {
               {timer}s
             </motion.div>
             <p style={{ opacity: 0.6, textAlign: "center" }}>
-              Welcome, {nickname}! The quiz starts when the countdown hits zero.
+              Welcome, {nickname}!
             </p>
             <div style={{ fontSize: "0.85rem", opacity: 0.5 }}>
               {players?.length || 0} player(s) in lobby
             </div>
+
+            {role === 'host' && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => socket.emit('host-start', { roomCode })}
+                style={{
+                  marginTop: '1rem',
+                  padding: '1rem 2.5rem',
+                  borderRadius: '1rem',
+                  background: 'linear-gradient(135deg, #10b981, #3b82f6)',
+                  border: 'none',
+                  color: '#fff',
+                  fontWeight: 800,
+                  fontSize: '1.1rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 20px rgba(16,185,129,0.4)'
+                }}
+              >
+                Start Quiz Now
+              </motion.button>
+            )}
           </motion.main>
         )}
 

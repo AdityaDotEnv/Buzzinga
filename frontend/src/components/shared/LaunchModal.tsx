@@ -92,10 +92,11 @@ export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic, q
         const room = await roomApi.create(finalQuizId!, finalHostSecret || '');
         console.log('Room created response:', room);
         
-        if (room.roomCode) {
+        if (room && room.roomCode) {
           setPin(room.roomCode);
+          console.log(`Room successfully initialized on backend: ${room.roomCode}`);
         } else {
-          console.error('Room creation failed: No roomCode returned');
+          console.error('Room creation failed: No roomCode returned from API', room);
         }
 
         // Store hostSecret from ROOM (it's the authoritative one for hosting)

@@ -36,10 +36,10 @@ export function GamePinCard({
   const isPinComplete = gamePin.length === 6;
 
   useEffect(() => {
-    if (isPinComplete && status === 'idle' && !isReady) {
+    if (isPinComplete && status === 'idle') {
       onJoin();
     }
-  }, [gamePin, isPinComplete, onJoin, status, isReady]);
+  }, [gamePin, isPinComplete, onJoin, status]);
 
   useEffect(() => {
     if (status === 'error') {
@@ -75,7 +75,19 @@ export function GamePinCard({
         </div>
       </div>
 
-      <NicknameInput value={nickname} onChange={onNicknameChange} isReady={isReady} onToggleReady={() => setIsReady(!isReady)} onAvatarChange={onAvatarChange} />
+      <NicknameInput 
+        value={nickname} 
+        onChange={onNicknameChange} 
+        isReady={isReady} 
+        onToggleReady={() => {
+          const next = !isReady;
+          setIsReady(next);
+          if (next && isPinComplete && status === 'idle') {
+            onJoin();
+          }
+        }} 
+        onAvatarChange={onAvatarChange} 
+      />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
         <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(148,163,184,0.5)', marginLeft: '0.25rem' }}>Send Hype</span>

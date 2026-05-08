@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Zap, Clock, Users, Search, Filter, Play, Edit } from 'lucide-react';
 import { quizApi, roomApi } from '../../services/api';
@@ -35,6 +35,7 @@ export function ExploreQuizzesPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [launchingQuiz, setLaunchingQuiz] = useState<any>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     async function fetchQuizzes() {
@@ -42,6 +43,16 @@ export function ExploreQuizzesPage() {
         const data = await quizApi.list();
         console.log('Fetched quizzes:', data);
         setQuizzes(data);
+        
+        // Auto-launch logic
+        if (location.state?.autoLaunch) {
+          const target = data.find((q: any) => q._id === location.state.autoLaunch);
+          if (target) {
+            setLaunchingQuiz(target);
+            // Clear state so it doesn't re-launch on refresh
+            window.history.replaceState(null, '');
+          }
+        }
       } catch (err) {
         console.error('Failed to fetch quizzes:', err);
       } finally {

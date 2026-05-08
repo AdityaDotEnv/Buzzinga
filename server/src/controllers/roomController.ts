@@ -35,6 +35,8 @@ export const createRoom = async (req: Request, res: Response) => {
       hostSecret,
     });
 
+    console.log(`[DB] Room ${roomCode} created successfully for quiz ${quizId}`);
+
     res.status(201).json({ 
       roomCode: room.roomCode, 
       status: room.status, 
@@ -59,12 +61,19 @@ export const joinRoom = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Room is no longer accepting players' });
     }
 
-    if (room.players.some(p => p.nickname === nickname)) {
+    // Atomically add player if nickname not already present
+    const updatedRoom = await Room.findOneAndUpdate(
+      { roomCode, 'players.nickname': { $ne: nickname } },
+      { $push: { players: { nickname, score: 0 } } },
+      { new: true }
+    );
+    
+    if (!updatedRoom) {
+      // Either room not found or nickname already taken
+      const roomCheck = await Room.findOne({ roomCode });
+      if (!roomCheck) return res.status(404).json({ message: 'Room not found' });
       return res.status(400).json({ message: 'Nickname already taken in this room' });
     }
-
-    room.players.push({ nickname, score: 0 });
-    await room.save();
 
     res.status(200).json({ message: 'Joined successfully', roomCode: room.roomCode });
   } catch (error) {
