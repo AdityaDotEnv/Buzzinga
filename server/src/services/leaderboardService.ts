@@ -1,38 +1,24 @@
+import User from '../models/User';
+
 export interface LeaderboardEntry {
   username: string;
   score: number;
-  wins: number;
+  wins?: number;
   streak?: number;
   accuracy?: number;
-  quizzesPlayed?: number;
+  quizzesPlayed: number;
 }
 
-export const getGlobalLeaderboardData = (): LeaderboardEntry[] => {
-  // Mock data for leaderboard
-  return [
-    {
-      username: 'Alex',
-      score: 1540,
-      wins: 24,
-      streak: 5,
-      accuracy: 92,
-      quizzesPlayed: 30
-    },
-    {
-      username: 'Jordan',
-      score: 1420,
-      wins: 18,
-      streak: 2,
-      accuracy: 88,
-      quizzesPlayed: 25
-    },
-    {
-      username: 'Taylor',
-      score: 1390,
-      wins: 15,
-      streak: 0,
-      accuracy: 85,
-      quizzesPlayed: 20
-    }
-  ];
+export const getGlobalLeaderboardData = async (limit: number = 10, skip: number = 0): Promise<LeaderboardEntry[]> => {
+  const users = await User.find()
+    .sort({ score: -1 })
+    .skip(skip)
+    .limit(limit)
+    .select('username score quizzesPlayed -_id');
+
+  return users.map(user => ({
+    username: user.username,
+    score: user.score || 0,
+    quizzesPlayed: user.quizzesPlayed || 0
+  }));
 };

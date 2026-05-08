@@ -11,11 +11,11 @@ type MobileDrawerProps = {
 }
 
 const defaultLinks = [
-  { label: 'Home', href: '#home' },
+  { label: 'Home', href: '/' },
   { label: 'Create Quiz', href: '/create-quiz' },
-  { label: 'Join Quiz', href: '#join' },
-  { label: 'Explore Quizzes', href: '#explore' },
-  { label: 'Leaderboards', href: '#leaderboards' },
+  { label: 'Join Quiz', href: '/join' },
+  { label: 'Explore Quizzes', href: '/explore' },
+  { label: 'Leaderboards', href: '/leaderboards' },
 ]
 
 export function MobileDrawer({ open, onClose, onLaunch, links = defaultLinks }: MobileDrawerProps) {

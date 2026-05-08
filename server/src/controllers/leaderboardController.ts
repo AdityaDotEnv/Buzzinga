@@ -1,20 +1,21 @@
 import { Request, Response } from 'express';
 import { getGlobalLeaderboardData } from '../services/leaderboardService';
+import User from '../models/User';
 
-export const getGlobalLeaderboard = (req: Request, res: Response): void => {
+export const getGlobalLeaderboard = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Placeholder pagination support
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
     
-    // Sort logic placeholder (already mock sorted, but leaving room for future DB sort)
-    const data = getGlobalLeaderboardData();
+    const data = await getGlobalLeaderboardData(limit, skip);
+    const total = await User.countDocuments();
     
     res.json({
       data,
       page,
       limit,
-      total: data.length
+      total
     });
   } catch (error: any) {
     res.status(500).json({ message: error.message });

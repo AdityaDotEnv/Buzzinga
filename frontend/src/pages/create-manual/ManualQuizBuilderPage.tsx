@@ -14,6 +14,8 @@ export function ManualQuizBuilderPage() {
   const [showToast, setShowToast] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [tags, setTags] = useState<string[]>(['Education', 'History']);
+  const [difficulty, setDifficulty] = useState('Intermediate');
   const [questions, setQuestions] = useState<any[]>([
     { id: '1', text: 'What is the primary function of a mitochondria?', options: ['Photosynthesis', 'Protein synthesis', 'Cell division', 'Powerhouse of the cell'], correct: 3 },
   ]);
@@ -29,6 +31,8 @@ export function ManualQuizBuilderPage() {
         body: JSON.stringify({
           title: title || 'Untitled Quiz',
           description: description || 'No description',
+          tags,
+          difficulty,
           questions: questions.map(q => ({
             text: q.text || 'Untitled Question',
             options: q.options || ['A', 'B', 'C', 'D'],
@@ -125,7 +129,12 @@ export function ManualQuizBuilderPage() {
         >
           {/* Left: metadata accordion + canvas */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <QuizMetadataPanel title={title} setTitle={setTitle} description={description} setDescription={setDescription} />
+            <QuizMetadataPanel 
+              title={title} setTitle={setTitle} 
+              description={description} setDescription={setDescription} 
+              tags={tags} setTags={setTags}
+              difficulty={difficulty} setDifficulty={setDifficulty}
+            />
             <QuestionCanvas questions={questions} setQuestions={setQuestions} />
           </div>
 

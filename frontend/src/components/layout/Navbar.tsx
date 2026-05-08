@@ -24,7 +24,7 @@ const defaultLinks: NavLink[] = [
   { label: 'Create Quiz', href: '/create-quiz' },
   { label: 'Join Quiz', href: '/join' },
   { label: 'Explore Quizzes', href: '/explore' },
-  { label: 'Leaderboards', href: '#leaderboards' },
+  { label: 'Leaderboards', href: '/leaderboards' },
 ]
 
 export function Navbar({

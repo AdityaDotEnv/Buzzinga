@@ -8,6 +8,7 @@ import { RoomCodePage } from './pages/play/RoomCodePage'
 import { ExploreQuizzesPage } from './pages/explore/ExploreQuizzesPage'
 import { LoginPage } from './pages/auth/LoginPage'
 import { SignupPage } from './pages/auth/SignupPage'
+import { LeaderboardsPage } from './pages/leaderboards/LeaderboardsPage'
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/explore" element={<ExploreQuizzesPage />} />
+      <Route path="/leaderboards" element={<LeaderboardsPage />} />
       <Route path="/create-quiz" element={<CreateQuizPage />} />
       <Route path="/create/manual" element={<ManualQuizBuilderPage />} />
       <Route path="/create/ai" element={<AIQuizGeneratorPage />} />

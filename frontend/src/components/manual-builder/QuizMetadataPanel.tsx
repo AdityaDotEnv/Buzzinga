@@ -9,13 +9,15 @@ interface Props {
   setTitle: (t: string) => void;
   description: string;
   setDescription: (d: string) => void;
+  tags: string[];
+  setTags: (tags: string[] | ((prev: string[]) => string[])) => void;
+  difficulty: string;
+  setDifficulty: (diff: string) => void;
 }
 
-export function QuizMetadataPanel({ title, setTitle, description, setDescription }: Props) {
+export function QuizMetadataPanel({ title, setTitle, description, setDescription, tags, setTags, difficulty, setDifficulty }: Props) {
   const [open, setOpen] = useState(true);
-  const [tags, setTags] = useState(TAGS);
   const [tagInput, setTagInput] = useState('');
-  const [difficulty, setDifficulty] = useState('Intermediate');
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && tagInput.trim()) {
