@@ -69,6 +69,13 @@ export function JoinQuizPage() {
 
   const isPinValid = gamePin.length === 6;
   const avatarColor = AVATAR_COLORS[selectedAvatar] || "#ec4899";
+  
+  // Reset error state when user starts typing again
+  useEffect(() => {
+    if (joinStatus === 'error') {
+      setJoinStatus('idle');
+    }
+  }, [gamePin, nickname]);
 
   const handleJoin = async () => {
     if (!gamePin || !nickname) {
