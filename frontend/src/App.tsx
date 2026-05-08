@@ -25,6 +25,9 @@ import { CareersPage } from './pages/misc/CareersPage'
 import { ContactPage } from './pages/misc/ContactPage'
 import { PrivacyPage } from './pages/misc/PrivacyPage'
 import { TermsPage } from './pages/misc/TermsPage'
+import { SettingsPage } from './pages/misc/SettingsPage'
+
+import { ProtectedRoute } from './components/auth/ProtectedRoute'
 
 export default function App() {
   return (
@@ -34,9 +37,14 @@ export default function App() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/explore" element={<ExploreQuizzesPage />} />
       <Route path="/leaderboards" element={<LeaderboardsPage />} />
-      <Route path="/create-quiz" element={<CreateQuizPage />} />
-      <Route path="/create/manual" element={<ManualQuizBuilderPage />} />
-      <Route path="/create/ai" element={<AIQuizGeneratorPage />} />
+      
+      {/* Protected Routes */}
+      <Route path="/create-quiz" element={<ProtectedRoute><CreateQuizPage /></ProtectedRoute>} />
+      <Route path="/create/manual" element={<ProtectedRoute><ManualQuizBuilderPage /></ProtectedRoute>} />
+      <Route path="/create/manual/:id" element={<ProtectedRoute><ManualQuizBuilderPage /></ProtectedRoute>} />
+      <Route path="/create/ai" element={<ProtectedRoute><AIQuizGeneratorPage /></ProtectedRoute>} />
+      <Route path="/create/ai/:id" element={<ProtectedRoute><AIQuizGeneratorPage /></ProtectedRoute>} />
+      
       <Route path="/join" element={<JoinQuizPage />} />
       <Route path="/play/:roomCode" element={<RoomCodePage />} />
       <Route path="/live" element={<RoomCodePage />} />
@@ -57,6 +65,7 @@ export default function App() {
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/terms" element={<TermsPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BuilderHero } from '../../components/manual-builder/BuilderHero';
 import { QuizMetadataPanel } from '../../components/manual-builder/QuizMetadataPanel';
 import { QuestionCanvas } from '../../components/manual-builder/QuestionCanvas';
 import { QuestionSettingsSidebar } from '../../components/manual-builder/QuestionSettingsSidebar';
 import { Navbar } from '../../components/layout/Navbar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { SuccessToast } from '../../components/join/SuccessToast';
 import '../../App.css';
 
 export function ManualQuizBuilderPage() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [showToast, setShowToast] = useState(false);
   const [title, setTitle] = useState('');
@@ -20,10 +21,42 @@ export function ManualQuizBuilderPage() {
     { id: '1', text: 'What is the primary function of a mitochondria?', options: ['Photosynthesis', 'Protein synthesis', 'Cell division', 'Powerhouse of the cell'], correct: 3 },
   ]);
 
+  useEffect(() => {
+    if (id) {
+      const fetchQuiz = async () => {
+        try {
+          const res = await fetch(`http://localhost:5000/api/quizzes/${id}`);
+          if (res.ok) {
+            const data = await res.json();
+            setTitle(data.title);
+            setDescription(data.description);
+            setTags(data.tags || []);
+            setDifficulty(data.difficulty || 'Intermediate');
+            if (data.questions && data.questions.length > 0) {
+              setQuestions(data.questions.map((q: any, idx: number) => ({
+                id: q._id || String(idx + 1),
+                text: q.text,
+                options: q.options,
+                correct: q.correct
+              })));
+            }
+          }
+        } catch (err) {
+          console.error('Failed to fetch quiz', err);
+        }
+      };
+      fetchQuiz();
+    }
+  }, [id]);
+
   const handleSaveDraft = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/quizzes', {
-        method: 'POST',
+      const url = id 
+        ? `http://localhost:5000/api/quizzes/${id}` 
+        : 'http://localhost:5000/api/quizzes';
+      
+      const res = await fetch(url, {
+        method: id ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`

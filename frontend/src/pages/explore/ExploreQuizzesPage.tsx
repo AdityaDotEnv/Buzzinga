@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Zap, Clock, Users, Search, Filter, Play } from 'lucide-react';
+import { Zap, Clock, Users, Search, Filter, Play, Edit } from 'lucide-react';
 import { quizApi, roomApi } from '../../services/api';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
@@ -132,14 +132,23 @@ export function ExploreQuizzesPage() {
                             </div>
                           </div>
                         </div>
-                        <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
+                        <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)', display: 'flex', gap: '0.75rem' }}>
                           <button 
                             className="primary-button" 
-                            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                            style={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                             onClick={() => setLaunchingQuiz(quiz)}
                           >
-                            <Play size={16} fill="currentColor" /> Play Now
+                            <Play size={16} fill="currentColor" /> Play
                           </button>
+                          {quiz.isOwner && (
+                            <button 
+                              className="ghost-button" 
+                              style={{ flex: 1, padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontSize: '0.8rem' }}
+                              onClick={() => navigate(`/create/manual/${quiz._id}`)}
+                            >
+                              <Edit size={14} /> Edit
+                            </button>
+                          )}
                         </div>
                       </motion.article>
                     ))}

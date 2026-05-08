@@ -91,18 +91,18 @@ return (
               <ChevronDown size={14} style={{ marginLeft: '0.25rem', opacity: 0.6, flexShrink: 0 }} />
             </summary>
             <div className={styles.menuPanel}>
-              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <Link to="/analytics" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <LayoutDashboard size={15} style={{ opacity: 0.7 }} />
                 Dashboard
-              </a>
-              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              </Link>
+              <Link to="/leaderboards" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <Trophy size={15} style={{ opacity: 0.7 }} />
                 Achievements
-              </a>
-              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              </Link>
+              <Link to="/settings" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <Settings size={15} style={{ opacity: 0.7 }} />
                 Settings
-              </a>
+              </Link>
               <a
                 href="#"
                 onClick={handleLogout}
