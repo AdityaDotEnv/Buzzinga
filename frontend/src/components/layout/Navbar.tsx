@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from '../ui/Icon'
+import { LayoutDashboard, Trophy, Settings, LogOut, ChevronDown } from 'lucide-react'
 import buzzingaLogo from '../../assets/buzzinga-logo.png'
 import styles from './Navbar.module.css'
 
@@ -87,12 +88,29 @@ return (
                 {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
               </span>
               {user.username || 'Profile'}
+              <ChevronDown size={14} style={{ marginLeft: '0.25rem', opacity: 0.6, flexShrink: 0 }} />
             </summary>
             <div className={styles.menuPanel}>
-              <a href="#">Dashboard</a>
-              <a href="#">Achievements</a>
-              <a href="#">Settings</a>
-              <a href="#" onClick={handleLogout}>Log out</a>
+              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <LayoutDashboard size={15} style={{ opacity: 0.7 }} />
+                Dashboard
+              </a>
+              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <Trophy size={15} style={{ opacity: 0.7 }} />
+                Achievements
+              </a>
+              <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <Settings size={15} style={{ opacity: 0.7 }} />
+                Settings
+              </a>
+              <a
+                href="#"
+                onClick={handleLogout}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#f87171' }}
+              >
+                <LogOut size={15} style={{ opacity: 0.85 }} />
+                Log out
+              </a>
             </div>
           </details>
         ) : (
