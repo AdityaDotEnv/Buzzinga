@@ -35,6 +35,8 @@ export const createRoom = async (req: Request, res: Response) => {
       hostSecret,
     });
 
+    console.log(`[DB] Room ${roomCode} created successfully for quiz ${quizId}`);
+
     res.status(201).json({ 
       roomCode: room.roomCode, 
       status: room.status, 

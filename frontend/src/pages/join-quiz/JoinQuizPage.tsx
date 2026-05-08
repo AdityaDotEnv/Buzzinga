@@ -307,19 +307,49 @@ export function JoinQuizPage() {
             hidden: { opacity: 0, y: 20 },
             show: { opacity: 1, y: 0 },
           }}
-          style={{ width: "100%", maxWidth: "500px", display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+          style={{
+            width: "100%",
+            maxWidth: "500px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1.5rem",
+          }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 0.5rem' }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Featured Rooms</h2>
-            <span style={{ fontSize: '0.75rem', opacity: 0.5, fontWeight: 700, textTransform: 'uppercase' }}>Quick Join</span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 0.5rem",
+            }}
+          >
+            <h2 style={{ fontSize: "1.1rem", fontWeight: 800, margin: 0 }}>
+              Featured Rooms
+            </h2>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                opacity: 0.5,
+                fontWeight: 700,
+                textTransform: "uppercase",
+              }}
+            >
+              Quick Join
+            </span>
           </div>
           {featuredQuizzes.map((quiz, i) => (
-            <div key={quiz._id} style={{ cursor: 'pointer' }} onClick={() => navigate('/explore', { state: { autoLaunch: quiz._id } })}>
-              <RoomPreviewCard 
+            <div
+              key={quiz._id}
+              style={{ cursor: "pointer" }}
+              onClick={() =>
+                navigate("/explore", { state: { autoLaunch: quiz._id } })
+              }
+            >
+              <RoomPreviewCard
                 title={quiz.title}
                 questions={quiz.questions?.length || 0}
-                host="Admin"
-                status="Waiting"
+                host="System"
+                status="Ready"
               />
             </div>
           ))}

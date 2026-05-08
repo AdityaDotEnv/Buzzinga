@@ -75,12 +75,6 @@ class GameManager {
       console.log(`Player ${nickname} joined room ${roomCode}`);
     }
     socket.join(roomCode);
-
-    // Start 30s countdown on first player
-    if (state.players.length === 1 && state.phase === 'waiting') {
-      this.startCountdown(state);
-    }
-
     this.broadcastState(roomCode);
   }
 
@@ -170,7 +164,12 @@ class GameManager {
 
   private handleHostStart(socket: Socket, roomCode: string) {
     const state = this.rooms.get(roomCode);
-    if (!state) return;
+    if (!state) {
+      console.warn(`Host tried to start non-existent room: ${roomCode}`);
+      return;
+    }
+    
+    console.log(`Host starting room: ${roomCode}`);
     if (state.phase === 'waiting' || state.phase === 'countdown') {
       if (state.autoStartTimer) clearInterval(state.autoStartTimer);
       this.startQuiz(state);

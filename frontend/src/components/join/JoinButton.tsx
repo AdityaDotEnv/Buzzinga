@@ -11,12 +11,12 @@ interface JoinButtonProps {
 
 export function JoinButton({ onClick, status, isPinComplete, isReady }: JoinButtonProps) {
   const isJoining = status === 'joining'
-  const isActive = isPinComplete && !isJoining && !isReady
+  const isActive = isPinComplete && !isJoining
   
   return (
     <motion.button
       onClick={onClick}
-      disabled={isJoining || !isPinComplete || isReady}
+      disabled={isJoining || !isPinComplete}
       whileTap={isActive ? { scale: 0.9 } : {}}
       animate={isReady ? {
         scale: [1, 1.03, 1],
@@ -40,7 +40,7 @@ export function JoinButton({ onClick, status, isPinComplete, isReady }: JoinButt
         background: isReady ? 'rgba(16,185,129,0.1)' : isPinComplete ? 'rgb(225,86,124)' : 'rgba(255,255,255,0.05)',
         color: isReady ? '#34d399' : isPinComplete ? '#fff' : 'rgba(148,163,184,0.5)',
         fontSize: '0.95rem', fontWeight: 700, fontFamily: 'inherit', letterSpacing: '0.06em', textTransform: 'uppercase',
-        cursor: isPinComplete && !isReady ? 'pointer' : 'not-allowed',
+    cursor: isPinComplete && !isJoining ? 'pointer' : 'not-allowed',
         opacity: isPinComplete ? 1 : 0.5,
         transition: 'all 300ms',
       }}
