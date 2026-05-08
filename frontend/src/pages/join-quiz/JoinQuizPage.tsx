@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setAuth } from "../../store/authSlice";
 import { motion, AnimatePresence } from "framer-motion";
@@ -56,8 +56,9 @@ function Star() {
 
 export function JoinQuizPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
-  const [gamePin, setGamePin] = useState("");
+  const [gamePin, setGamePin] = useState(location.state?.pin || "");
   const [nickname, setNickname] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState("🦊");
   const [joinStatus, setJoinStatus] = useState<JoinStatus>("idle");
@@ -313,7 +314,7 @@ export function JoinQuizPage() {
             <span style={{ fontSize: '0.75rem', opacity: 0.5, fontWeight: 700, textTransform: 'uppercase' }}>Quick Join</span>
           </div>
           {featuredQuizzes.map((quiz, i) => (
-            <div key={quiz._id} style={{ cursor: 'pointer' }} onClick={() => navigate('/explore')}>
+            <div key={quiz._id} style={{ cursor: 'pointer' }} onClick={() => navigate('/explore', { state: { autoLaunch: quiz._id } })}>
               <RoomPreviewCard 
                 title={quiz.title}
                 questions={quiz.questions?.length || 0}

@@ -49,7 +49,7 @@ function HomePage() {
       return
     }
 
-    handleLaunch(`Joining room ${cleanCode}`)
+    navigate('/join', { state: { pin: cleanCode } })
   }
 
 return (
