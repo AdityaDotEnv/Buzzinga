@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BuilderHero } from '../../components/manual-builder/BuilderHero';
 import { QuizMetadataPanel } from '../../components/manual-builder/QuizMetadataPanel';
@@ -10,6 +10,41 @@ import '../../App.css';
 
 export function ManualQuizBuilderPage() {
   const navigate = useNavigate();
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [questions, setQuestions] = useState<any[]>([
+    { id: '1', text: 'What is the primary function of a mitochondria?', options: ['Photosynthesis', 'Protein synthesis', 'Cell division', 'Powerhouse of the cell'], correct: 3 },
+  ]);
+
+  const handleSaveDraft = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/quizzes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          title: title || 'Untitled Quiz',
+          description: description || 'No description',
+          questions: questions.map(q => ({
+            text: q.text || 'Untitled Question',
+            options: q.options || ['A', 'B', 'C', 'D'],
+            correct: q.correct !== null ? q.correct : 0
+          }))
+        })
+      });
+      if (res.ok) {
+        alert('Draft saved successfully!');
+        navigate('/explore');
+      } else {
+        alert('Failed to save draft. Please ensure you are logged in.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error saving draft');
+    }
+  };
 
   return (
     /*
@@ -88,12 +123,12 @@ export function ManualQuizBuilderPage() {
         >
           {/* Left: metadata accordion + canvas */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <QuizMetadataPanel />
-            <QuestionCanvas />
+            <QuizMetadataPanel title={title} setTitle={setTitle} description={description} setDescription={setDescription} />
+            <QuestionCanvas questions={questions} setQuestions={setQuestions} />
           </div>
 
           {/* Right: sticky control tower */}
-          <QuestionSettingsSidebar />
+          <QuestionSettingsSidebar onSaveDraft={handleSaveDraft} />
         </div>
       </div>
 

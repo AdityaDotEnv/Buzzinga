@@ -3,7 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Trophy, Shuffle, PlayCircle, Rocket } from 'lucide-react';
 import { LaunchModal } from '../shared/LaunchModal';
 
-export function QuestionSettingsSidebar() {
+interface Props {
+  onSaveDraft?: () => void;
+}
+
+export function QuestionSettingsSidebar({ onSaveDraft }: Props) {
   const [showLaunch, setShowLaunch] = useState(false);
   return (
     <motion.div
@@ -88,6 +92,7 @@ export function QuestionSettingsSidebar() {
 
       {/* Save draft */}
       <motion.button
+        onClick={onSaveDraft}
         whileHover={{ scale: 1.02, boxShadow: '0 0 28px rgba(236,72,153,0.5)' }}
         whileTap={{ scale: 0.96 }}
         style={{ width: '100%', padding: '0.85rem', borderRadius: '0.85rem', background: 'linear-gradient(135deg, #ec4899, #a855f7)', border: 'none', color: '#fff', fontSize: '0.88rem', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 0 16px rgba(236,72,153,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
