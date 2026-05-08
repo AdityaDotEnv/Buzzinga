@@ -70,12 +70,12 @@ return (
             <a href="#">Settings</a>
           </div>
         </details>
-        <a className="ghost-button" href="#login">
+        <Link className="ghost-button" to="/login">
           Log in
-        </a>
-        <button className="primary-button" type="button" onClick={() => onLaunch('Sign up flow opened')}>
+        </Link>
+        <Link className="primary-button" to="/signup">
           Sign up
-        </button>
+        </Link>
       </div>
 
       <button
@@ -106,12 +106,12 @@ return (
           ),
         )}
         <div className={styles.mobileDrawerActions}>
-          <a className="ghost-button" href="#login">
+          <Link className="ghost-button" to="/login" onClick={onToggleMobileMenu}>
             Log in
-          </a>
-          <button className="primary-button" type="button" onClick={() => onLaunch('Sign up flow opened')}>
+          </Link>
+          <Link className="primary-button" to="/signup" onClick={onToggleMobileMenu}>
             Sign up
-          </button>
+          </Link>
         </div>
       </div>
     </header>

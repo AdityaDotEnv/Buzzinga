@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { createQuiz, getQuiz, getAllQuizzes } from '../controllers/quizController';
+import { protect } from '../middleware/authMiddleware';
 
 const router = Router();
 
 // @route   POST /api/quizzes
-router.post('/', createQuiz);
+router.post('/', protect as any, createQuiz);
 
 // @route   GET /api/quizzes
 router.get('/', getAllQuizzes);

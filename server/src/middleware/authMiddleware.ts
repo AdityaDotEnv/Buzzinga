@@ -1,44 +1,36 @@
 import { Request, Response, NextFunction } from 'express';
-import Room from '../models/roomModel';
+import { verifyToken } from '../utils/tokenUtils';
+import User from '../models/User';
 
-/**
- * Middleware to protect routes that only the host should access.
- * Checks for hostSecret in headers or body.
- */
-export const protectHost = async (req: Request, res: Response, next: NextFunction) => {
-  const hostSecret = req.headers['x-host-secret'] || req.body.hostSecret;
+export interface AuthRequest extends Request {
+  user?: any;
+}
 
-  if (!hostSecret) {
-    return res.status(401).json({ message: 'Access denied. No host secret provided.' });
-  }
+export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  let token;
 
-  // If roomCode is provided in URL or body, verify against the room
-  const roomCode = req.params.roomCode || req.body.roomCode;
-  if (roomCode) {
-    const room = await Room.findOne({ roomCode });
-    if (!room) return res.status(404).json({ message: 'Room not found' });
-    
-    if (room.hostSecret !== hostSecret) {
-      return res.status(403).json({ message: 'Invalid host secret for this room.' });
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = verifyToken(token);
+      
+      req.user = await User.findById(decoded.id).select('-passwordHash');
+      
+      if (!req.user) {
+        res.status(401).json({ message: 'Not authorized, user not found' });
+        return;
+      }
+      
+      next();
+    } catch (error) {
+      console.error(error);
+      res.status(401).json({ message: 'Not authorized, token failed' });
+      return;
     }
-    // Attach room to request for convenience
-    (req as any).room = room;
   }
 
-  next();
-};
-
-/**
- * Middleware to protect routes that only admins should access.
- * Compares X-Admin-Token header against environment variable.
- */
-export const protectAdmin = (req: Request, res: Response, next: NextFunction) => {
-  const adminToken = req.headers['x-admin-token'];
-  const SYSTEM_ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'buzzinga-admin-secret-2026';
-
-  if (!adminToken || adminToken !== SYSTEM_ADMIN_TOKEN) {
-    return res.status(403).json({ message: 'Admin access denied.' });
+  if (!token) {
+    res.status(401).json({ message: 'Not authorized, no token' });
+    return;
   }
-
-  next();
 };

@@ -1,5 +1,6 @@
 import { Icon } from '../../../components/ui/Icon'
 import buzzingaLogo from '../../../assets/buzzinga-logo.png'
+import { Link } from 'react-router-dom'
 
 type MobileDrawerProps = {
   open: boolean
@@ -33,12 +34,12 @@ export function MobileDrawer({ open, onClose, onLaunch, links = defaultLinks }: 
         </a>
       ))}
       <div className="mobile-drawer-actions">
-        <a className="ghost-button" href="#login">
+        <Link className="ghost-button" to="/login" onClick={onClose}>
           Log in
-        </a>
-        <button className="primary-button" type="button" onClick={() => onLaunch('Sign up flow opened')}>
+        </Link>
+        <Link className="primary-button" to="/signup" onClick={onClose}>
           Sign up
-        </button>
+        </Link>
       </div>
     </div>
   )
