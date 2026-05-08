@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="frontend/public/buzzinga-1200x-high-resolution-color-logo.png" alt="Buzzinga Logo" width="600">
+  <img src="frontend/public/buzzinga-1200x-no-bg-high-resolution-color-logo.png" alt="Buzzinga Logo" width="600">
   
   <p align="center">
     <b>High-energy, real-time multiplayer quiz platform.</b>
