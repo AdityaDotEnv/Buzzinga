@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Icon } from '../../../components/ui/Icon'
 import buzzingaLogo from '../../../assets/buzzinga-logo.png'
 import { Link } from 'react-router-dom'
@@ -18,6 +19,27 @@ const defaultLinks = [
 ]
 
 export function MobileDrawer({ open, onClose, onLaunch, links = defaultLinks }: MobileDrawerProps) {
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser))
+      } catch (e) {
+        console.error('Failed to parse user', e)
+      }
+    }
+  }, [open]) // Re-check when drawer opens
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault()
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setUser(null)
+    window.location.href = '/'
+  }
+
   if (!open) return null
 
   return (
@@ -34,12 +56,25 @@ export function MobileDrawer({ open, onClose, onLaunch, links = defaultLinks }: 
         </a>
       ))}
       <div className="mobile-drawer-actions">
-        <Link className="ghost-button" to="/login" onClick={onClose}>
-          Log in
-        </Link>
-        <Link className="primary-button" to="/signup" onClick={onClose}>
-          Sign up
-        </Link>
+        {user ? (
+          <>
+            <div style={{ padding: '0 1rem', marginBottom: '1rem', color: 'rgba(226, 232, 240, 0.85)', fontWeight: 600 }}>
+              {user.username}
+            </div>
+            <a className="ghost-button" href="#" onClick={(e) => { handleLogout(e); onClose(); }}>
+              Log out
+            </a>
+          </>
+        ) : (
+          <>
+            <Link className="ghost-button" to="/login" onClick={onClose}>
+              Log in
+            </Link>
+            <Link className="primary-button" to="/signup" onClick={onClose}>
+              Sign up
+            </Link>
+          </>
+        )}
       </div>
     </div>
   )
