@@ -81,7 +81,6 @@ export function LaunchModal({ onClose, quizTitle, questionCount, grade, topic, q
             questions: [
               { text: 'Sample Question?', options: ['A', 'B', 'C', 'D'], correct: 0 }
             ],
-            creatorId: 'host-123'
           });
           finalQuizId = quiz._id;
           finalHostSecret = quiz.hostSecret;

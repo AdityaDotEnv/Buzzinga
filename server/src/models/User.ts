@@ -17,6 +17,8 @@ const UserSchema: Schema = new Schema(
       required: true,
       unique: true,
       trim: true,
+      minlength: 3,
+      maxlength: 32,
     },
     email: {
       type: String,
@@ -24,10 +26,12 @@ const UserSchema: Schema = new Schema(
       sparse: true,  // allows multiple null/missing values
       trim: true,
       lowercase: true,
+      maxlength: 254,
     },
     passwordHash: {
       type: String,
       required: true,
+      select: false,
     },
     avatar: {
       type: String,

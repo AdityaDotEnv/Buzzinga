@@ -8,6 +8,7 @@ import { Navbar } from '../../components/layout/Navbar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { SuccessToast } from '../../components/join/SuccessToast';
 import { ErrorToast } from '../../components/shared/ErrorToast';
+import { quizApi } from '../../services/api';
 import '../../App.css';
 
 export function ManualQuizBuilderPage() {
@@ -29,13 +30,8 @@ export function ManualQuizBuilderPage() {
     if (id) {
       const fetchQuiz = async () => {
         try {
-          const res = await fetch(`http://localhost:5000/api/quizzes/${id}`, {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-          });
-          if (res.ok) {
-            const data = await res.json();
+          const data = await quizApi.get(id);
+          if (data.isOwner) {
             setTitle(data.title);
             setDescription(data.description);
             setTags(data.tags || []);
@@ -49,7 +45,7 @@ export function ManualQuizBuilderPage() {
                 correct: q.correct
               })));
             }
-          }
+          } else setErrorToast('You can only edit quizzes you created.');
         } catch (err) {
           console.error('Failed to fetch quiz', err);
         }
@@ -61,27 +57,9 @@ export function ManualQuizBuilderPage() {
   const handleSaveDraft = async () => {
     if (isSaving) return;
     
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('Save Draft Failed: No auth token found in localStorage');
-      setErrorToast('You must be logged in to save a quiz.');
-      setTimeout(() => navigate('/login'), 3000);
-      return;
-    }
-
     setIsSaving(true);
     try {
-      const url = id 
-        ? `http://localhost:5000/api/quizzes/${id}` 
-        : 'http://localhost:5000/api/quizzes';
-      
-      const res = await fetch(url, {
-        method: id ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
+      const payload = {
           title: title || 'Untitled Quiz',
           description: description || 'No description',
           tags,
@@ -92,12 +70,9 @@ export function ManualQuizBuilderPage() {
             options: q.options || ['A', 'B', 'C', 'D'],
             correct: q.correct !== null ? q.correct : 0
           }))
-        })
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
+        };
+      const data = id ? await quizApi.update(id, payload) : await quizApi.create(payload);
+      if (data) {
         console.log('Quiz saved successfully:', data);
         setShowToast(true);
         // If it was a new quiz, update the URL to include the ID
@@ -105,10 +80,6 @@ export function ManualQuizBuilderPage() {
           window.history.replaceState(null, '', `/create/manual/${data._id}`);
         }
         setTimeout(() => navigate('/explore'), 2000);
-      } else {
-        const errorMsg = data.message || 'Unknown server error';
-        console.error(`Save Draft Failed (${res.status}):`, data);
-        setErrorToast(`Failed to save draft: ${errorMsg}`);
       }
     } catch (e: any) {
       console.error('Save Draft Error:', e);

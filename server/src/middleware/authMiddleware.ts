@@ -3,7 +3,13 @@ import { verifyToken } from '../utils/tokenUtils';
 import User from '../models/User';
 
 export interface AuthRequest extends Request {
-  user?: any;
+  user?: {
+    id: string;
+    username: string;
+    email?: string;
+    avatar?: string;
+    createdAt: Date;
+  };
 }
 
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -14,13 +20,19 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
       token = req.headers.authorization.split(' ')[1];
       const decoded = verifyToken(token);
       
-      req.user = await User.findById(decoded.id).select('-passwordHash');
+      const user = await User.findById(decoded.id).select('username email avatar createdAt');
       
-      if (!req.user) {
+      if (!user) {
         res.status(401).json({ message: 'Not authorized, user not found' });
         return;
       }
-      
+      req.user = {
+        id: user._id.toString(),
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
+        createdAt: user.createdAt,
+      };
       next();
     } catch (error) {
       console.error(error);
@@ -40,7 +52,16 @@ export const optionalProtect = async (req: AuthRequest, res: Response, next: Nex
     try {
       const token = req.headers.authorization.split(' ')[1];
       const decoded = verifyToken(token);
-      req.user = await User.findById(decoded.id).select('-passwordHash');
+      const user = await User.findById(decoded.id).select('username email avatar createdAt');
+      if (user) {
+        req.user = {
+          id: user._id.toString(),
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar,
+          createdAt: user.createdAt,
+        };
+      }
     } catch (error) {
       // Ignore token failure for optional protection
     }

@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '../../store';
+import { setSession } from '../../store/authSlice';
+import { authApi } from '../../services/api';
 import styles from "./AuthPage.module.css";
 import { Navbar } from "../../components/layout/Navbar";
 
@@ -12,6 +16,8 @@ export function LoginPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleLaunch = (message: string) => {
     setNotice(message);
@@ -24,20 +30,10 @@ export function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
-      navigate("/");
+      const data = await authApi.login({ username, password });
+      dispatch(setSession(data));
+      const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/';
+      navigate(from, { replace: true });
     } catch (err: any) {
       setError(err.message);
     } finally {
