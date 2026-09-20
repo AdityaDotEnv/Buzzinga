@@ -53,7 +53,7 @@ export const getQuiz = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getAllQuizzes = async (req: Request, res: Response) => {
+export const getAllQuizzes = async (req: AuthRequest, res: Response) => {
   try {
     const quizzes = await Quiz.find().select('title description questions timeLimit createdAt creatorId');
     

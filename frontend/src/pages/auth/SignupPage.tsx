@@ -15,7 +15,7 @@ export function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [, setNotice] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
@@ -28,10 +28,26 @@ export function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const cleanUsername = username.trim();
+    const cleanEmail = email.trim();
+    if (cleanUsername.length < 3) {
+      setError('Username must contain at least 3 characters.');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must contain at least 8 characters.');
+      return;
+    }
+    if (cleanEmail && !/^\S+@\S+\.\S+$/.test(cleanEmail)) {
+      setError('Enter a valid email address or leave it blank.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const data = await authApi.signup({ username, email, password });
+      const data = await authApi.signup({ username: cleanUsername, email: cleanEmail, password });
       dispatch(setSession(data));
       const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/';
       navigate(from, { replace: true });
@@ -44,7 +60,7 @@ export function SignupPage() {
 
   const passwordStrength = (() => {
     if (password.length === 0) return null;
-    if (password.length < 6) return "weak";
+    if (password.length < 8) return "weak";
     if (password.length < 10) return "fair";
     return "strong";
   })();
@@ -218,10 +234,10 @@ export function SignupPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={styles.authInput}
-                  placeholder="Min. 6 characters"
+                  placeholder="Min. 8 characters"
                   autoComplete="new-password"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
                 <button
                   type="button"

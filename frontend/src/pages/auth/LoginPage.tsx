@@ -14,7 +14,7 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [, setNotice] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();

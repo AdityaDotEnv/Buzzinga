@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import type { AppDispatch, RootState } from '../../store'
@@ -34,7 +34,7 @@ const defaultLinks: NavLink[] = [
 export function Navbar({
   mobileMenuOpen,
   onToggleMobileMenu,
-  onLaunch,
+  onLaunch: _onLaunch,
   links = defaultLinks,
   mobileLinks = defaultLinks,
   brandHref = '/',

@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IUser extends Document {
   username: string;
-  email: string;
+  email?: string;
   passwordHash: string;
   avatar?: string;
   score: number;

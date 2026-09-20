@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 const signupSchema = z.object({
   username: z.string().trim().min(3).max(32),
-  email: z.string().trim().email().max(254),
+  email: z.string().trim().email().max(254).optional().or(z.literal('')),
   password: z.string().min(8).max(128),
 });
 
@@ -28,10 +28,13 @@ export const signupUser = async (req: Request, res: Response): Promise<void> => 
   try {
     const parsed = signupSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ message: 'Invalid signup details' });
+      res.status(400).json({
+        message: parsed.error.issues[0]?.message || 'Invalid signup details',
+      });
       return;
     }
-    const { username, email, password } = parsed.data;
+    const { username, password } = parsed.data;
+    const email = parsed.data.email || undefined;
 
     const userExists = await User.findOne({
       $or: [
