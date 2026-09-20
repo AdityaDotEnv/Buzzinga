@@ -1,5 +1,8 @@
-import { useState, useEffect, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import type { AppDispatch, RootState } from '../../store'
+import { clearAuth, clearSession } from '../../store/authSlice'
 import { Icon } from '../ui/Icon'
 import { LayoutDashboard, Trophy, Settings, LogOut, ChevronDown } from 'lucide-react'
 import buzzingaLogo from '../../assets/buzzinga-logo.png'
@@ -31,7 +34,7 @@ const defaultLinks: NavLink[] = [
 export function Navbar({
   mobileMenuOpen,
   onToggleMobileMenu,
-  onLaunch,
+  onLaunch: _onLaunch,
   links = defaultLinks,
   mobileLinks = defaultLinks,
   brandHref = '/',
@@ -48,24 +51,13 @@ export function Navbar({
       </a>
     )
 
-  const [user, setUser] = useState<any>(null)
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser))
-      } catch (e) {
-        console.error('Failed to parse user', e)
-      }
-    }
-  }, [])
+  const user = useSelector((state: RootState) => state.auth.user)
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault()
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    setUser(null)
+    dispatch(clearSession())
+    dispatch(clearAuth())
     window.location.href = '/'
   }
 

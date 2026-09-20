@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '../../store';
+import { setSession } from '../../store/authSlice';
+import { authApi } from '../../services/api';
 import styles from "./AuthPage.module.css";
 import { Navbar } from "../../components/layout/Navbar";
 
@@ -11,8 +15,10 @@ export function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [, setNotice] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleLaunch = (message: string) => {
     setNotice(message);
@@ -22,23 +28,29 @@ export function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const cleanUsername = username.trim();
+    const cleanEmail = email.trim();
+    if (cleanUsername.length < 3) {
+      setError('Username must contain at least 3 characters.');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must contain at least 8 characters.');
+      return;
+    }
+    if (cleanEmail && !/^\S+@\S+\.\S+$/.test(cleanEmail)) {
+      setError('Enter a valid email address or leave it blank.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Signup failed");
-      }
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
-      navigate("/");
+      const data = await authApi.signup({ username: cleanUsername, email: cleanEmail, password });
+      dispatch(setSession(data));
+      const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/';
+      navigate(from, { replace: true });
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -48,7 +60,7 @@ export function SignupPage() {
 
   const passwordStrength = (() => {
     if (password.length === 0) return null;
-    if (password.length < 6) return "weak";
+    if (password.length < 8) return "weak";
     if (password.length < 10) return "fair";
     return "strong";
   })();
@@ -222,10 +234,10 @@ export function SignupPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={styles.authInput}
-                  placeholder="Min. 6 characters"
+                  placeholder="Min. 8 characters"
                   autoComplete="new-password"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
                 <button
                   type="button"

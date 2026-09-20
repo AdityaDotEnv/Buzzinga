@@ -50,7 +50,7 @@ Buzzinga is a high-energy, real-time multiplayer quiz platform designed for mode
 ### Prerequisites
 
 - Node.js (v20+)
-- MongoDB (Local or Atlas)
+- MongoDB Community Server (local) and MongoDB Shell (`mongosh`)
 
 ### 1. Clone the Repository
 
@@ -65,7 +65,7 @@ Create a `.env` file in the `server/` directory:
 
 ```env
 PORT=5000
-MONGODB_URI=your_mongodb_connection_string
+LOCAL_MONGO_URI=mongodb://127.0.0.1:27017/buzzinga
 JWT_SECRET=your_jwt_secret
 NODE_ENV=development
 ```
@@ -91,6 +91,16 @@ npm run dev
 # Start frontend (from /frontend)
 npm run dev
 ```
+
+### Local MongoDB
+
+Buzzinga connects to the local `buzzinga` database by default. Start MongoDB Community Server, then verify it with:
+
+```bash
+mongosh "mongodb://127.0.0.1:27017/buzzinga"
+```
+
+Inside the shell, `show collections` confirms the database after the app creates data. Set `LOCAL_MONGO_URI` only when your local server uses a different host, port, or database name. The legacy Atlas `MONGO_URI` setting is not used.
 
 ## 🏗️ Architecture
 

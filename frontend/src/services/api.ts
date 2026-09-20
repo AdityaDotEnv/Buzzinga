@@ -1,22 +1,51 @@
 const API_BASE_URL = 'http://localhost:5000/api';
 
+export interface AuthUser {
+  id: string;
+  username: string;
+  email?: string;
+  avatar?: string;
+  createdAt?: string;
+}
+
+interface AuthResponse {
+  user: AuthUser;
+  token: string;
+}
+
+const request = async (path: string, options: RequestInit = {}) => {
+  const token = localStorage.getItem('token');
+  const headers = new Headers(options.headers);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+  const body = await response.json();
+  if (!response.ok) throw new Error(body.message || 'Request failed');
+  return body;
+};
+
+export const authApi = {
+  signup: (input: { username: string; email: string; password: string }) =>
+    request('/auth/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) }) as Promise<AuthResponse>,
+  login: (input: { username: string; password: string }) =>
+    request('/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) }) as Promise<AuthResponse>,
+  me: () => request('/auth/me') as Promise<{ user: AuthUser }>,
+};
+
 export const quizApi = {
   create: async (quizData: any) => {
-    const res = await fetch(`${API_BASE_URL}/quizzes`, {
+    return request('/quizzes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(quizData),
     });
-    return res.json();
   },
   get: async (id: string) => {
-    const res = await fetch(`${API_BASE_URL}/quizzes/${id}`);
-    return res.json();
+    return request(`/quizzes/${id}`);
   },
   list: async () => {
-    const res = await fetch(`${API_BASE_URL}/quizzes`);
-    return res.json();
+    return request('/quizzes');
   },
+  update: (id: string, quizData: unknown) => request(`/quizzes/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(quizData) }),
 };
 
 export const roomApi = {
